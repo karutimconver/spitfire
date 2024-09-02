@@ -6,7 +6,7 @@ function love.conf(t)
     
     t.window.icon = "res/images/icon.png"
 
-    t.window.width = 1068
+    t.window.width = 1069
     t.window.height = 600
     t.window.fullscreen = fullscreen
     t.console = true
