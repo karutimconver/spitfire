@@ -5,8 +5,6 @@ function _G.drawLine(x1, y1, x2, y2)
 
     local y_step = -(y1 - y2) / length
     local x_step = -(x1 - x2) / length
-    print(y_step)
-    print(x_step)
     local px = x1
     local py = y1
 

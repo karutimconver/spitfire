@@ -14,7 +14,7 @@ end
 function love.update(dt)
     --print(love.graphics.getWidth())
     --print(love.graphics.getHeight())
-    update3d()
+    update3d(dt)
 end
 
 function love.draw()
