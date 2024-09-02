@@ -11,9 +11,9 @@ function love.update()
 end
 
 function love.draw()
-    maid64.start()--starts the maid64 process
+    maid64.start()
+    
     love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
-    --love.graphics.rectangle("fill", 0, 0, 320, 180)
     love.graphics.setColor(255, 255, 255)
     love.graphics.rectangle("fill", 0, 0, 2, 2)
 
@@ -28,6 +28,5 @@ function love.keypressed(key)
 end
 
 function love.resize(w, h)
-    -- this is used to resize the screen correctly
     maid64.resize(w, h)
 end
