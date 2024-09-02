@@ -33,11 +33,11 @@ function _G.init3d()
     })
 
     -- Projection matrix
-    local Near = 0.1;
-	local Far = 1000.0;
-	local FOV = 90.0;
-	local AspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH;
-	local fov = 1.0 / math.tan(math.rad(FOV * 0.5));
+    local Near = 0.1
+	local Far = 1000.0
+	local FOV = 90.0
+	local AspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
+	local fov = 1.0 / math.tan(math.rad(FOV * 0.5))
 
     _G.matProj = Matrix()
     _G.matRotZ = Matrix()
@@ -45,32 +45,32 @@ function _G.init3d()
 
     _G.Theta = 0
 
-    matProj.m[1][1] = AspectRatio * fov;
-	matProj.m[2][2] = fov;
-	matProj.m[3][3] = Far / (Far - Near);
-	matProj.m[4][3] = (-Far * Near) / (Far - Near);
-	matProj.m[3][4] = 1.0;
-	matProj.m[4][4] = 0.0;
+    matProj.m[1][1] = AspectRatio * fov
+	matProj.m[2][2] = fov
+	matProj.m[3][3] = Far / (Far - Near)
+	matProj.m[4][3] = (-Far * Near) / (Far - Near)
+	matProj.m[3][4] = 1.0
+	matProj.m[4][4] = 0.0
 end
 
 function _G.update3d(dt)
     Theta = Theta + 1 * dt
 
     -- Rotation Z
-	matRotZ.m[1][1] = math.cos(Theta);
-	matRotZ.m[1][2] = math.sin(Theta);
-	matRotZ.m[2][1] = -math.sin(Theta);
-	matRotZ.m[2][2] = math.cos(Theta);
-	matRotZ.m[3][3] = 1;
-	matRotZ.m[4][4] = 1;
+	matRotZ.m[1][1] = math.cos(Theta)
+	matRotZ.m[1][2] = math.sin(Theta)
+	matRotZ.m[2][1] = -math.sin(Theta)
+	matRotZ.m[2][2] = math.cos(Theta)
+	matRotZ.m[3][3] = 1
+	matRotZ.m[4][4] = 1
 
 	-- Rotation X
-	matRotX.m[1][1] = 1;
-	matRotX.m[2][2] = math.cos(Theta * 0.5);
-	matRotX.m[2][3] = math.sin(Theta * 0.5);
-	matRotX.m[3][2] = -math.sin(Theta * 0.5);
-	matRotX.m[3][3] = math.cos(Theta * 0.5);
-	matRotX.m[4][4] = 1;
+	matRotX.m[1][1] = 1
+	matRotX.m[2][2] = math.cos(Theta * 0.5)
+	matRotX.m[2][3] = math.sin(Theta * 0.5)
+	matRotX.m[3][2] = -math.sin(Theta * 0.5)
+	matRotX.m[3][3] = math.cos(Theta * 0.5)
+	matRotX.m[4][4] = 1
 end
 
 function _G.draw3d()
@@ -108,8 +108,10 @@ function _G.draw3d()
         triProjected.p[3].x = triProjected.p[3].x * SCREEN_WIDTH * 0.5
         triProjected.p[3].y = triProjected.p[3].y * SCREEN_HEIGHT * 0.5
 
-        drawPoly({math.floor(triProjected.p[1].x + 0.5), math.floor(triProjected.p[1].y + 0.5),
-                  math.floor(triProjected.p[2].x + 0.5), math.floor(triProjected.p[2].y + 0.5),
-                  math.floor(triProjected.p[3].x + 0.5), math.floor(triProjected.p[3].y + 0.5)})
+        love.graphics.setColor(0, 1, 0)
+        drawPoly({triProjected.p[1].x, triProjected.p[1].y,
+                  triProjected.p[2].x, triProjected.p[2].y,
+                  triProjected.p[3].x, triProjected.p[3].y})
+        love.graphics.setColor(1, 1, 1)
     end
 end

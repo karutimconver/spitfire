@@ -1,6 +1,4 @@
-local love = require "love"
-
-_G.font = {
+local font = {
 A = {1, 1, 1, "N",
      1, 0, 1, "N",
      1, 1, 1, "N",
@@ -261,59 +259,4 @@ Z = {1, 1, 1, "N",
          0, 1, 0, "E"},
 }
 
-function _G.drawGlyph(glyph, x, y, color)
-    if glyph == " " then
-        return
-    end
-
-    if string.len(glyph) ~= 1 then
-        print("Error! drawGlyph only draws 1 glyph!")
-        return
-    end
-
-    glyph = string.upper(glyph)
-
-    local line = -2
-    local column = -1
-
-    if font[glyph] == nil then
-        print("Error! glyph " .. glyph .. " doesn't exist")
-        return
-    end
-
-    for _, code in pairs(font[glyph]) do
-        if code == 1 then
-            love.graphics.setColor(color[1] / 255, color[2] / 255, color[3] / 255)
-            love.graphics.points(x + column, y + line)
-            love.graphics.setColor(1, 1, 1)
-        end
-
-        column = column + 1
-
-        if code == "N" then
-            column = -1
-            line = line + 1
-        elseif code == "E" then
-            return
-        end
-    end
-
-    print("Warning: glyph " .. glyph .. " doesn't have an end flag!")
-end
-
-function _G.drawText(text, x, y, color)
-    local c = color or {255, 255, 255}
-    local w = 3
-
-    local l = string.len(text)
-
-    local lenght = (l * w) + (l - 1)
-
-    local glyph_x = x - math.floor(lenght / 2) + 1
-
-    for glyph in text:gmatch(".") do
-        drawGlyph(glyph, glyph_x, y, c)
-
-        glyph_x = glyph_x + w + 1
-    end
-end
+return font

@@ -1,5 +1,4 @@
 require "src/globals"
-require "src/draw/font"
 require "src/draw/draw"
 require "src/3drendering/main3d"
 
@@ -21,6 +20,8 @@ function love.draw()
     maid64.start()
     love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
     draw3d()
+    fillRect(100, 100, 20, 20, 1)
+    fillCircle(50, 50, 10)
     maid64.finish()
 end
 

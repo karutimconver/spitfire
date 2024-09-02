@@ -12,3 +12,7 @@ function _G.copy(obj, seen)
     for k, v in pairs(obj) do res[copy(k, s)] = copy(v, s) end
     return res
 end
+
+function _G.round(val)
+    return math.floor(val + 0.5)
+end
