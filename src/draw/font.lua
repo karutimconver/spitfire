@@ -301,7 +301,7 @@ function _G.drawGlyph(glyph, x, y, color)
     print("Warning: glyph " .. glyph .. " doesn't have an end flag!")
 end
 
-drawText = function(text, x, y, color)
+function _G.drawText(text, x, y, color)
     local c = color or {255, 255, 255}
     local w = 3
 
