@@ -10,5 +10,5 @@ function love.conf(t)
     t.window.width = 1069
     t.window.height = 600
     t.window.fullscreen = fullscreen
-    t.console = true
+    t.console = debugging
 end

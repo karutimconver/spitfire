@@ -8,27 +8,31 @@ local maid64 = require("lib/maid64")
 function love.load()
     maid64.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
     init3d()
+    _G.pause = false
 end
 
 function love.update(dt)
     --print(love.graphics.getWidth())
     --print(love.graphics.getHeight())
-    update3d(dt)
+    if not pause then
+        update3d(dt)
+    end
 end
 
 function love.draw()
     maid64.start()
     love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
     draw3d()
-    fillRect(100, 100, 20, 20, 1)
-    fillCircle(50, 50, 10)
     maid64.finish()
 end
 
 function love.keypressed(key)
     if key == "f11" then
-        fullscreen = not fullscreen
+        _G.fullscreen = not fullscreen
         love.window.setFullscreen(fullscreen)
+    end
+    if key == "p" then
+        _G.pause = not pause
     end
 end
 

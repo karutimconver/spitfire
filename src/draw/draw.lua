@@ -103,7 +103,12 @@ function _G.drawPoly(points)
 end
 
 function _G.fillPoly(points)
-    love.graphics.polygon("fill", points)
+    local floored = {}
+    for i, p in pairs(points) do
+        table.insert(floored, math.floor(p))
+    end
+
+    love.graphics.polygon("fill", floored)
     drawPoly(points)
 end
 
