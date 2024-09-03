@@ -10,7 +10,8 @@ end
 
 function Triangle(p1, p2, p3)
     return {
-        p = {p1, p2, p3}
+        p = {p1, p2, p3},
+        dp = 0,
     }
 end
 

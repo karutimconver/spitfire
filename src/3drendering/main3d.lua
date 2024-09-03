@@ -81,7 +81,9 @@ end
 
 function _G.draw3d()
     -- Draw triangle
+    local trianglesToDraw = {}
 
+    -- Draw
     for _, triangle in pairs(meshCube.triangles) do
         local triProjected = Triangle()
         local triRotatedZ = Triangle()
@@ -119,7 +121,7 @@ function _G.draw3d()
 		local l = math.sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z)
 		normal.x = normal.y / l; normal.y = normal.y / l; normal.z = normal.z / l
 
-        if normal.x * (triTranslated.p[1].x - Camera.x) +
+        if normal.x * (triTranslated.p[1].x - Camera.x) + 
            normal.y * (triTranslated.p[1].y - Camera.y) +
            normal.z * (triTranslated.p[1].z - Camera.z) < 0 then
             -- light
@@ -129,7 +131,7 @@ function _G.draw3d()
             light_direction.y = light_direction.y / l
             light_direction.z = light_direction.z / l
 
-            local dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z
+            triProjected.dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z
 
             -- project
             triProjected.p[1] = MultiplyMatrixVector(triTranslated.p[1], matProj)
@@ -147,19 +149,32 @@ function _G.draw3d()
             triProjected.p[3].x = triProjected.p[3].x * SCREEN_WIDTH * 0.5
             triProjected.p[3].y = triProjected.p[3].y * SCREEN_HEIGHT * 0.5
 
-            love.graphics.setColor(0 * dp, 1 * dp, 0 * dp)
-            fillPoly({triProjected.p[1].x, triProjected.p[1].y,
-                      triProjected.p[2].x, triProjected.p[2].y,
-                      triProjected.p[3].x, triProjected.p[3].y})
-
-            -- Wireframe object
-            if debugging then
-                love.graphics.setColor(0, 0, 0)
-                drawPoly({triProjected.p[1].x, triProjected.p[1].y,
-                          triProjected.p[2].x, triProjected.p[2].y,
-                          triProjected.p[3].x, triProjected.p[3].y})
-            end
-            love.graphics.setColor(1, 1, 1)
+            table.insert(trianglesToDraw, triProjected)
         end
+    end
+
+    -- Sort triangle
+    table.sort(trianglesToDraw, function(a, b)
+        local triangle1 = (a.p[1].z + a.p[2].z + a.p[3].z) / 3;
+		local triangle2 = (b.p[1].z + b.p[2].z + b.p[3].z) / 3;
+		return triangle1 > triangle2;
+
+        end)
+
+    -- Render
+    for _, triangle in pairs(trianglesToDraw) do
+        love.graphics.setColor(0 * triangle.dp, 1 * triangle.dp, 0 * triangle.dp)
+        fillPoly({triangle.p[1].x, triangle.p[1].y,
+                  triangle.p[2].x, triangle.p[2].y,
+                  triangle.p[3].x, triangle.p[3].y})
+
+        -- Wireframe object
+        if debugging then
+            love.graphics.setColor(0, 0, 0)
+            drawPoly({triangle.p[1].x, triangle.p[1].y,
+                      triangle.p[2].x, triangle.p[2].y,
+                      triangle.p[3].x, triangle.p[3].y})
+        end
+        love.graphics.setColor(1, 1, 1)
     end
 end
