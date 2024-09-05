@@ -1,13 +1,11 @@
-function MultiplyMatrixVector(v, m)
+function Matrix_MultiplyVector(m, v)
     local o = Vec3()
-    o.x = v.x * m.m[1][1] + v.y * m.m[2][1] + v.z * m.m[3][1] + m.m[4][1];
-    o.y = v.x * m.m[1][2] + v.y * m.m[2][2] + v.z * m.m[3][2] + m.m[4][2];
-    o.z = v.x * m.m[1][3] + v.y * m.m[2][3] + v.z * m.m[3][3] + m.m[4][3];
-    local w = v.x * m.m[1][4] + v.y * m.m[2][4] + v.z * m.m[3][4] + m.m[4][4];
 
-    if (w ~= 0.0) then
-        o.x = o.x / w; o.y = o.y / w; o.z = o.z / w;
-    end
+    o.x = v.x * m.m[1][1] + v.y * m.m[2][1] + v.z * m.m[3][1] + m.m[4][1]
+    o.y = v.x * m.m[1][2] + v.y * m.m[2][2] + v.z * m.m[3][2] + m.m[4][2]
+    o.z = v.x * m.m[1][3] + v.y * m.m[2][3] + v.z * m.m[3][3] + m.m[4][3]
+    o.w = v.x * m.m[1][4] + v.y * m.m[2][4] + v.z * m.m[3][4] + m.m[4][4]
+
     return o
 end
 
@@ -89,7 +87,7 @@ function Matrix_MultiplyMatrix(m1, m2)
     local matrix = Matrix()
 
     for c = 1, 4 do
-        for r = 0, 4 do
+        for r = 1, 4 do
             matrix.m[r][c] = m1.m[r][1] * m2.m[1][c] + m1.m[r][2] * m2.m[2][c] + m1.m[r][3] * m2.m[3][c] + m1.m[r][4] * m2.m[4][c];
         end
     end
