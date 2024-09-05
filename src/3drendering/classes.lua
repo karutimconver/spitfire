@@ -11,7 +11,7 @@ end
 function Triangle(p1, p2, p3)
     return {
         p = {p1, p2, p3},
-        dp = 0,
+        dp = 1,
     }
 end
 
@@ -59,6 +59,8 @@ function Mesh(triangles)
                     table.insert(self.triangles, Triangle(vertices[v1], vertices[v2], vertices[v3]))
                 end
             end
+
+            print("Mesh '" .. path .. "' loaded succesfully (" .. #self.triangles .. " triangles)")
 
             --for j, point in pairs(vertices) do
             --    print("point " .. j .. ":")

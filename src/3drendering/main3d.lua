@@ -56,7 +56,8 @@ function _G.init3d()
 	matProj.m[3][4] = 1.0
 	matProj.m[4][4] = 0.0
 
-    meshCube:loadObjectFile("res/meshes/ship.obj")
+    meshCube:loadObjectFile("res/meshes/spitfire.obj")
+    --meshCube:loadObjectFile("res/meshes/untitled.obj")
 end
 
 function _G.update3d(dt)
@@ -99,27 +100,31 @@ function _G.draw3d()
 
         -- offset
         local triTranslated = triRotatedZX
-        triTranslated.p[1].z = triRotatedZX.p[1].z + 8
-        triTranslated.p[2].z = triRotatedZX.p[2].z + 8
-        triTranslated.p[3].z = triRotatedZX.p[3].z + 8
+        triTranslated.p[1].z = triRotatedZX.p[1].z + 18
+        triTranslated.p[2].z = triRotatedZX.p[2].z + 18
+        triTranslated.p[3].z = triRotatedZX.p[3].z + 18
 
         -- Calculate normal
-        local normal = Vec3(); local line1 = Vec3(); local line2 = Vec3()
+        local normal = Vec3()
 
+        local line1 = Vec3()
         line1.x = triTranslated.p[2].x - triTranslated.p[1].x
         line1.y = triTranslated.p[2].y - triTranslated.p[1].y
         line1.z = triTranslated.p[2].z - triTranslated.p[1].z
 
+        local line2 = Vec3()
         line2.x = triTranslated.p[3].x - triTranslated.p[1].x
         line2.y = triTranslated.p[3].y - triTranslated.p[1].y
         line2.z = triTranslated.p[3].z - triTranslated.p[1].z
 
         normal.x = line1.y * line2.z - line1.z * line2.y
-		normal.y = line1.z * line2.x - line1.x * line2.z
-		normal.z = line1.x * line2.y - line1.y * line2.x
+        normal.y = line1.z * line2.x - line1.x * line2.z
+        normal.z = line1.x * line2.y - line1.y * line2.x
 
-		local l = math.sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z)
-		normal.x = normal.y / l; normal.y = normal.y / l; normal.z = normal.z / l
+        local l = math.sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z)
+        normal.x = normal.x / l
+        normal.y = normal.y / l
+        normal.z = normal.z / l
 
         if normal.x * (triTranslated.p[1].x - Camera.x) + 
            normal.y * (triTranslated.p[1].y - Camera.y) +
