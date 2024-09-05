@@ -41,6 +41,13 @@ function _G.init3d()
 	local AspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
 	local fov = 1.0 / math.tan(math.rad(FOV * 0.5))
 
+    matProj.m[1][1] = AspectRatio * fov
+	matProj.m[2][2] = fov
+	matProj.m[3][3] = Far / (Far - Near)
+	matProj.m[4][3] = (-Far * Near) / (Far - Near)
+	matProj.m[3][4] = 1.0
+	matProj.m[4][4] = 0.0
+
     _G.Camera = Vec3()
 
     _G.matProj = Matrix()
@@ -48,13 +55,6 @@ function _G.init3d()
     _G.matRotX = Matrix()
 
     _G.Theta = 0
-
-    matProj.m[1][1] = AspectRatio * fov
-	matProj.m[2][2] = fov
-	matProj.m[3][3] = Far / (Far - Near)
-	matProj.m[4][3] = (-Far * Near) / (Far - Near)
-	matProj.m[3][4] = 1.0
-	matProj.m[4][4] = 0.0
 
     meshCube:loadObjectFile("res/meshes/spitfire.obj")
     --meshCube:loadObjectFile("res/meshes/untitled.obj")
