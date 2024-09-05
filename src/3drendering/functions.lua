@@ -10,3 +10,42 @@ function MultiplyMatrixVector(v, m)
     end
     return o
 end
+
+function Vector_Add(v1, v2)
+    return Vec3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z)
+end
+
+function Vector_Subtract(v1, v2)
+    return Vec3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z)
+end
+
+function Vector_Mul(v1, k)
+    return Vec3(v1.x * k, v1.y * k, v1.z * k)
+end
+
+function Vector_Div(v1, k)
+    return Vec3(v1.x / k, v1.y / k, v1.z / k)
+end
+
+function Vector_Dot(v1, v2)
+    return v1.x*v2.x + v1.y*v2.y + v1.z * v2.z
+end
+
+function Vector_Length(v)
+    return math.sqrt(Vector_Dot(v, v))
+end
+
+function Vector_Normalise(v)
+    local l = Vector_Length(v)
+    return Vec3(v.x / l, v.y / l, v.z / l)
+end
+
+function Vector_Cross(v1, v2)
+    local v = Vec3()
+
+    v.x = v1.y * v2.z - v1.z * v2.y
+    v.y = v1.z * v2.x - v1.x * v2.z
+    v.z = v1.x * v2.y - v1.y * v2.x
+
+    return v
+end
