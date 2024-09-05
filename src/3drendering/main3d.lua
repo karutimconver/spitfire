@@ -6,55 +6,19 @@ require "src/draw/draw"
 local love = require "love"
 
 function _G.init3d()
-    _G.meshCube = Mesh(
-    --{
-    --    -- SOUTH
-    --    Triangle(Vec3(0.0, 0.0, 0.0), Vec3(0.0, 1.0, 0.0), Vec3(1.0, 1.0, 0.0)),
-    --    Triangle(Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 0.0), Vec3(1.0, 0.0, 0.0)),
---
-    --    -- EAST                                                      
-    --    Triangle(Vec3(1.0, 0.0, 0.0), Vec3(1.0, 1.0, 0.0), Vec3(1.0, 1.0, 1.0)),
-    --    Triangle(Vec3(1.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0), Vec3(1.0, 0.0, 1.0)),
---
-    --    -- NORTH                                                     
-    --    Triangle(Vec3(1.0, 0.0, 1.0), Vec3(1.0, 1.0, 1.0), Vec3(0.0, 1.0, 1.0)),
-    --    Triangle(Vec3(1.0, 0.0, 1.0), Vec3(0.0, 1.0, 1.0), Vec3(0.0, 0.0, 1.0)),
---
-    --    -- WEST                                                      
-    --    Triangle(Vec3(0.0, 0.0, 1.0), Vec3(0.0, 1.0, 1.0), Vec3(0.0, 1.0, 0.0)),
-    --    Triangle(Vec3(0.0, 0.0, 1.0), Vec3(0.0, 1.0, 0.0), Vec3(0.0, 0.0, 0.0)),
---
-    --    -- TOP                                                       
-    --    Triangle(Vec3(0.0, 1.0, 0.0), Vec3(0.0, 1.0, 1.0), Vec3(1.0, 1.0, 1.0)),
-    --    Triangle(Vec3(0.0, 1.0, 0.0), Vec3(1.0, 1.0, 1.0), Vec3(1.0, 1.0, 0.0)),
---
-    --    -- BOTTOM                                                    
-    --    Triangle(Vec3(1.0, 0.0, 1.0), Vec3(0.0, 0.0, 1.0), Vec3(0.0, 0.0, 0.0)),
-    --    Triangle(Vec3(1.0, 0.0, 1.0), Vec3(0.0, 0.0, 0.0), Vec3(1.0, 0.0, 0.0)),
-    --}
-    )
+    _G.meshCube = Mesh()
 
     -- Projection matrix
     local Near = 0.1
 	local Far = 1000.0
 	local FOV = 90.0
 	local AspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
-	local fov = 1.0 / math.tan(math.rad(FOV * 0.5))
 
     _G.Camera = Vec3()
 
-    _G.matProj = Matrix()
-    _G.matRotZ = Matrix()
-    _G.matRotX = Matrix()
+    _G.matProj = Matrix_MakeProjection(FOV, AspectRatio, Near, Far)
 
     _G.Theta = 0
-
-    matProj.m[1][1] = AspectRatio * fov
-	matProj.m[2][2] = fov
-	matProj.m[3][3] = Far / (Far - Near)
-	matProj.m[4][3] = (-Far * Near) / (Far - Near)
-	matProj.m[3][4] = 1.0
-	matProj.m[4][4] = 0.0
 
     meshCube:loadObjectFile("res/meshes/spitfire.obj")
     --meshCube:loadObjectFile("res/meshes/untitled.obj")
@@ -64,20 +28,10 @@ function _G.update3d(dt)
     Theta = Theta + 1 * dt
 
     -- Rotation Z
-	matRotZ.m[1][1] = math.cos(Theta)
-	matRotZ.m[1][2] = math.sin(Theta)
-	matRotZ.m[2][1] = -math.sin(Theta)
-	matRotZ.m[2][2] = math.cos(Theta)
-	matRotZ.m[3][3] = 1
-	matRotZ.m[4][4] = 1
+	matRotZ = Matrix_MakeRotationZ(Theta)
 
 	-- Rotation X
-	matRotX.m[1][1] = 1
-	matRotX.m[2][2] = math.cos(Theta * 0.5)
-	matRotX.m[2][3] = math.sin(Theta * 0.5)
-	matRotX.m[3][2] = -math.sin(Theta * 0.5)
-	matRotX.m[3][3] = math.cos(Theta * 0.5)
-	matRotX.m[4][4] = 1
+	matRotX = Matrix_MakeRotationX(Theta)
 end
 
 function _G.draw3d()
@@ -130,13 +84,10 @@ function _G.draw3d()
            normal.y * (triTranslated.p[1].y - Camera.y) +
            normal.z * (triTranslated.p[1].z - Camera.z) < 0 then
             -- light
-            local light_direction = Vec3(0, 0, -1);
-            local l = math.sqrt(light_direction.x^2 + light_direction.y^2 + light_direction.z^2)
-            light_direction.x = light_direction.x / l
-            light_direction.y = light_direction.y / l
-            light_direction.z = light_direction.z / l
+            local light_direction = Vec3(0, 0, -1)
+            light_direction = Vector_Normalise(light_direction)
 
-            triProjected.dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z
+            triProjected.dp = Vector_Dot(normal, light_direction)
 
             -- project
             triProjected.p[1] = MultiplyMatrixVector(triTranslated.p[1], matProj)
