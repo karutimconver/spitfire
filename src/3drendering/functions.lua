@@ -95,6 +95,40 @@ function Matrix_MultiplyMatrix(m1, m2)
     return matrix;
 end
 
+function Matrix_PointAt(pos, target, up)
+    -- Calculate a new forward vector
+    local newForward = Vector_Sub(target, pos)
+    newForward = Vector_Normalise(newForward)
+
+    -- Calculate new Up direction
+    local a = Vector_Mul(newForward, Vector_Dot(up, newForward))
+    local newUp = Vector_Sub(up, a)
+    newUp = Vector_Normalise(newUp)
+
+    -- New Right direction is easy, its just cross product
+    local newRight = Vector_Cross(newUp, newForward)
+
+    -- Construct Dimensioning and Translation Matrix	
+    local matrix = Matrix()
+    matrix.m[1][1] = newRight.x;	matrix.m[1][2] = newRight.y;	matrix.m[1][3] = newRight.z;	matrix.m[1][4] = 0
+    matrix.m[2][1] = newUp.x;		matrix.m[2][2] = newUp.y;		matrix.m[2][3] = newUp.z;		matrix.m[2][4] = 0
+    matrix.m[3][1] = newForward.x;	matrix.m[3][2] = newForward.y;	matrix.m[3][3] = newForward.z;	matrix.m[3][4] = 0
+    matrix.m[4][1] = pos.x;			matrix.m[4][2] = pos.y;			matrix.m[4][3] = pos.z;			matrix.m[4][4] = 1
+    return matrix
+end
+
+function Matrix_QuickInverse(m)
+    local matrix = Matrix()
+    matrix.m[1][1] = m.m[1][1]; matrix.m[1][2] = m.m[2][1]; matrix.m[1][3] = m.m[3][1]; matrix.m[1][4] = 0
+    matrix.m[2][1] = m.m[1][2]; matrix.m[2][2] = m.m[2][2]; matrix.m[2][3] = m.m[3][2]; matrix.m[2][4] = 0
+    matrix.m[3][1] = m.m[1][3]; matrix.m[3][2] = m.m[2][3]; matrix.m[3][3] = m.m[3][3]; matrix.m[3][4] = 0
+    matrix.m[4][1] = -(m.m[4][1] * matrix.m[1][1] + m.m[4][2] * matrix.m[2][1] + m.m[4][3] * matrix.m[3][1])
+    matrix.m[4][2] = -(m.m[4][1] * matrix.m[1][2] + m.m[4][2] * matrix.m[2][2] + m.m[4][3] * matrix.m[3][2])
+    matrix.m[4][3] = -(m.m[4][1] * matrix.m[1][3] + m.m[4][2] * matrix.m[2][3] + m.m[4][3] * matrix.m[3][3])
+    matrix.m[4][4] = 1
+    return matrix
+end
+
 ------------
 -- Vector --
 ------------

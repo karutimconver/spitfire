@@ -15,17 +15,43 @@ function _G.init3d()
 	local AspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
 
     _G.Camera = Vec3()
+    _G.LookDir = Vec3(0, 0, 1)
+    _G.Yaw = 0
 
     _G.matProj = Matrix_MakeProjection(FOV, AspectRatio, Near, Far)
 
     _G.Theta = 0
 
-    meshCube:loadObjectFile("res/meshes/spitfire.obj")
+    meshCube:loadObjectFile("res/meshes/spitfire2.obj")
     --meshCube:loadObjectFile("res/meshes/untitled.obj")
 end
 
 function _G.update3d(dt)
-    Theta = Theta + 1 * dt
+    if love.keyboard.isDown("w") then
+        Camera.y = Camera.y + 8 * dt
+    elseif love.keyboard.isDown("s") then
+        Camera.y = Camera.y - 8 * dt
+    end
+
+    if love.keyboard.isDown("d") then
+        Camera.x = Camera.x + 8 * dt
+    elseif love.keyboard.isDown("a") then
+        Camera.x = Camera.x - 8 * dt
+    end
+
+    local forward = Vector_Mul(LookDir, 8 * dt)
+
+    if love.keyboard.isDown("left") then
+        Yaw = Yaw + 2 * dt
+    elseif love.keyboard.isDown("right") then
+        Yaw = Yaw - 2 * dt
+    end
+
+    if love.keyboard.isDown("up") then
+        Camera = Vector_Add(Camera, forward)
+    elseif love.keyboard.isDown("down") then
+        Camera = Vector_Sub(Camera, forward)
+    end
 
     -- Rotation Z
 	_G.matRotZ = Matrix_MakeRotationZ(Theta)
@@ -38,6 +64,15 @@ function _G.update3d(dt)
     _G.matWorld = Matrix_MakeIdentity()
     _G.matWorld = Matrix_MultiplyMatrix(matRotZ, matRotX)
     _G.matWorld = Matrix_MultiplyMatrix(matWorld, matTrans)
+
+    local Up = Vec3(0, 1, 0)
+    local Target = Vec3(0, 0, 1)
+    local matCameraRot = Matrix_MakeRotationY(Yaw)
+    LookDir = Matrix_MultiplyVector(matCameraRot, Target)
+    Target = Vector_Add(Camera, LookDir)
+
+    local matCamera = Matrix_PointAt(Camera, Target, Up)
+    _G.matView = Matrix_QuickInverse(matCamera)
 end
 
 function _G.draw3d()
@@ -48,6 +83,7 @@ function _G.draw3d()
     for _, triangle in pairs(meshCube.triangles) do
         local triProjected = Triangle()
         local triTransformed = Triangle()
+        local triViewed = Triangle()
         -- Rotate
         triTransformed.p[1] = Matrix_MultiplyVector(matWorld, triangle.p[1])
         triTransformed.p[2] = Matrix_MultiplyVector(matWorld, triangle.p[2])
@@ -72,15 +108,20 @@ function _G.draw3d()
 
         if Vector_Dot(normal, CameraRay) < 0 then
             -- light
-            local light_direction = Vec3(0, 0, -1)
+            local light_direction = Vec3(0, 1, -1)
             light_direction = Vector_Normalise(light_direction)
 
             triProjected.dp = math.max(0.1, Vector_Dot(normal, light_direction))
 
+            -- Convert world space into view space
+            triViewed.p[1] = Matrix_MultiplyVector(matView, triTransformed.p[1])
+            triViewed.p[2] = Matrix_MultiplyVector(matView, triTransformed.p[2])
+            triViewed.p[3] = Matrix_MultiplyVector(matView, triTransformed.p[3])
+
             -- project
-            triProjected.p[1] = Matrix_MultiplyVector(matProj, triTransformed.p[1])
-            triProjected.p[2] = Matrix_MultiplyVector(matProj, triTransformed.p[2])
-            triProjected.p[3] = Matrix_MultiplyVector(matProj, triTransformed.p[3])
+            triProjected.p[1] = Matrix_MultiplyVector(matProj, triViewed.p[1])
+            triProjected.p[2] = Matrix_MultiplyVector(matProj, triViewed.p[2])
+            triProjected.p[3] = Matrix_MultiplyVector(matProj, triViewed.p[3])
 
             triProjected.p[1] = Vector_Div(triProjected.p[1], triProjected.p[1].w)
             triProjected.p[2] = Vector_Div(triProjected.p[2], triProjected.p[2].w)
@@ -105,9 +146,9 @@ function _G.draw3d()
 
     -- Sort triangle
     table.sort(trianglesToDraw, function(a, b)
-        local triangle1 = (a.p[1].z + a.p[2].z + a.p[3].z) / 3;
-		local triangle2 = (b.p[1].z + b.p[2].z + b.p[3].z) / 3;
-		return triangle1 > triangle2;
+        local z1 = (a.p[1].z + a.p[2].z + a.p[3].z) / 3;
+		local z2 = (b.p[1].z + b.p[2].z + b.p[3].z) / 3;
+		return z1 > z2;
 
         end)
 
