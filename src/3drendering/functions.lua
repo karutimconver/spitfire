@@ -169,3 +169,70 @@ function Vector_Cross(v1, v2)
     v.z = v1.x * v2.y - v1.y * v2.x
     return v
 end
+
+function Vector_IntersectPlane(plane_p, plane_n, lineStart, lineEnd)
+    plane_n = Vector_Normalise(plane_n)
+    local plane_d = -Vector_Dot(plane_n, plane_p)
+    local ad = Vector_Dot(lineStart, plane_n)
+    local bd = Vector_Dot(lineEnd, plane_n)
+    local t = (-plane_d - ad) / (bd - ad)
+    local lineStartToEnd = Vector_Sub(lineEnd, lineStart)
+    local lineToIntersect = Vector_Mul(lineStartToEnd, t)
+    return Vector_Add(lineStart, lineToIntersect)
+end
+
+function Triangle_ClippedAgainstPlane(plane_p, plane_n, in_tri)
+    plane_n = Vector_Normalise(plane_n)
+
+    local dist = function (p)
+        return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - Vector_Dot(plane_n, plane_p))
+    end
+
+    local insidePoints = {}; local insidePointCount = 0
+    local outsidePoints = {}; local outsidePointCount = 0
+
+    local d1 = dist(in_tri.p[1])
+    local d2 = dist(in_tri.p[2])
+    local d3 = dist(in_tri.p[3])
+
+    if d1 >= 0 then insidePoints[insidePointCount + 1] = in_tri.p[1]; insidePointCount = insidePointCount + 1;
+    else outsidePoints[outsidePointCount + 1] = in_tri.p[1]; outsidePointCount = outsidePointCount + 1
+    end
+    if d2 >= 0 then insidePoints[insidePointCount + 1] = in_tri.p[2]; insidePointCount = insidePointCount + 1
+    else outsidePoints[outsidePointCount + 1] = in_tri.p[1]; outsidePointCount = outsidePointCount + 1
+    end
+    if d3 >= 0 then insidePoints[insidePointCount + 1] = in_tri.p[3]; insidePointCount = insidePointCount + 1
+    else outsidePoints[outsidePointCount + 1] = in_tri.p[1]; outsidePointCount = outsidePointCount + 1
+    end
+
+    if insidePointCount == 0 then
+        return {}
+    elseif insidePointCount == 3 then
+        return {in_tri}
+    elseif insidePointCount == 1 and outsidePointCount == 2 then
+        local out_tri = Triangle()
+        out_tri.dp = in_tri.dp
+
+        out_tri.p[1] = insidePoints[1]
+        out_tri.p[2] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[1], outsidePoints[1])
+        out_tri.p[3] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[1], outsidePoints[2])
+        return {out_tri}
+    elseif insidePoints == 2 and outsidePoints == 1 then
+        local out_tri1 = Triangle()
+        local out_tri2 = Triangle()
+
+        out_tri1.dp = in_tri.dp
+        out_tri2.dp = in_tri.dp
+
+        out_tri1.p[1] = insidePoints[1]
+        out_tri1.p[2] = insidePoints[2]
+        out_tri1.p[3] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[1], outsidePoints[1])
+
+        out_tri2.p[1] = insidePoints[2]
+        out_tri2.p[2] = out_tri1.p[3]
+        out_tri2.p[3] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[2], outsidePoints[1])
+
+        return {out_tri1, out_tri2}
+    end
+    return {}
+end

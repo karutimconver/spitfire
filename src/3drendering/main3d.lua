@@ -111,36 +111,43 @@ function _G.draw3d()
             local light_direction = Vec3(0, 1, -1)
             light_direction = Vector_Normalise(light_direction)
 
-            triProjected.dp = math.max(0.1, Vector_Dot(normal, light_direction))
+            triViewed.dp = math.max(0.1, Vector_Dot(normal, light_direction))
 
             -- Convert world space into view space
             triViewed.p[1] = Matrix_MultiplyVector(matView, triTransformed.p[1])
             triViewed.p[2] = Matrix_MultiplyVector(matView, triTransformed.p[2])
             triViewed.p[3] = Matrix_MultiplyVector(matView, triTransformed.p[3])
 
-            -- project
-            triProjected.p[1] = Matrix_MultiplyVector(matProj, triViewed.p[1])
-            triProjected.p[2] = Matrix_MultiplyVector(matProj, triViewed.p[2])
-            triProjected.p[3] = Matrix_MultiplyVector(matProj, triViewed.p[3])
+            local clipped = Triangle_ClippedAgainstPlane(Vec3(0, 0, 0.1), Vec3(0, 0, 1), triViewed)
+            local clippedTriangles = #clipped
 
-            triProjected.p[1] = Vector_Div(triProjected.p[1], triProjected.p[1].w)
-            triProjected.p[2] = Vector_Div(triProjected.p[2], triProjected.p[2].w)
-            triProjected.p[3] = Vector_Div(triProjected.p[3], triProjected.p[3].w)
+            local i = 0
+            while i < clippedTriangles do
+                i = i + 1
+                -- project
+                triProjected.p[1] = Matrix_MultiplyVector(matProj, clipped[i].p[1])
+                triProjected.p[2] = Matrix_MultiplyVector(matProj, clipped[i].p[2])
+                triProjected.p[3] = Matrix_MultiplyVector(matProj, clipped[i].p[3])
 
-            -- offset
-            local offset = Vec3(1, 1, 0)
-            triProjected.p[1] = Vector_Add(triProjected.p[1], offset)
-            triProjected.p[2] = Vector_Add(triProjected.p[2], offset)
-            triProjected.p[3] = Vector_Add(triProjected.p[3], offset)
+                triProjected.p[1] = Vector_Div(triProjected.p[1], triProjected.p[1].w)
+                triProjected.p[2] = Vector_Div(triProjected.p[2], triProjected.p[2].w)
+                triProjected.p[3] = Vector_Div(triProjected.p[3], triProjected.p[3].w)
 
-            triProjected.p[1].x = triProjected.p[1].x * SCREEN_WIDTH * 0.5
-            triProjected.p[1].y = triProjected.p[1].y * SCREEN_HEIGHT * 0.5
-            triProjected.p[2].x = triProjected.p[2].x * SCREEN_WIDTH * 0.5
-            triProjected.p[2].y = triProjected.p[2].y * SCREEN_HEIGHT * 0.5
-            triProjected.p[3].x = triProjected.p[3].x * SCREEN_WIDTH * 0.5
-            triProjected.p[3].y = triProjected.p[3].y * SCREEN_HEIGHT * 0.5
+                -- offset
+                local offset = Vec3(1, 1, 0)
+                triProjected.p[1] = Vector_Add(triProjected.p[1], offset)
+                triProjected.p[2] = Vector_Add(triProjected.p[2], offset)
+                triProjected.p[3] = Vector_Add(triProjected.p[3], offset)
 
-            table.insert(trianglesToDraw, triProjected)
+                triProjected.p[1].x = triProjected.p[1].x * SCREEN_WIDTH * 0.5
+                triProjected.p[1].y = triProjected.p[1].y * SCREEN_HEIGHT * 0.5
+                triProjected.p[2].x = triProjected.p[2].x * SCREEN_WIDTH * 0.5
+                triProjected.p[2].y = triProjected.p[2].y * SCREEN_HEIGHT * 0.5
+                triProjected.p[3].x = triProjected.p[3].x * SCREEN_WIDTH * 0.5
+                triProjected.p[3].y = triProjected.p[3].y * SCREEN_HEIGHT * 0.5
+
+                table.insert(trianglesToDraw, triProjected)
+            end
         end
     end
 

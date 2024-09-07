@@ -1,7 +1,7 @@
 _G.SCREEN_WIDTH = 319 -- 1920
 _G.SCREEN_HEIGHT = 179 --1080
 
-_G.debugging = false
+_G.debugging = true
 
 _G.fullscreen = false
 
