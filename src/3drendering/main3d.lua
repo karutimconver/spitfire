@@ -77,11 +77,10 @@ end
 
 function _G.draw3d()
     -- Draw triangle
-    local trianglesToDraw = {}
+    local trianglesToRaster = {}
 
     -- Draw
     for _, triangle in pairs(meshCube.triangles) do
-        local triProjected = Triangle()
         local triTransformed = Triangle()
         local triViewed = Triangle()
         -- Rotate
@@ -108,30 +107,29 @@ function _G.draw3d()
 
         if Vector_Dot(normal, CameraRay) < 0 then
             -- light
-            local light_direction = Vec3(0, 1, -1)
+            local light_direction = Vec3(0, -1, -1)
             light_direction = Vector_Normalise(light_direction)
 
             triViewed.dp = math.max(0.1, Vector_Dot(normal, light_direction))
-
             -- Convert world space into view space
             triViewed.p[1] = Matrix_MultiplyVector(matView, triTransformed.p[1])
             triViewed.p[2] = Matrix_MultiplyVector(matView, triTransformed.p[2])
             triViewed.p[3] = Matrix_MultiplyVector(matView, triTransformed.p[3])
 
-            local clipped = Triangle_ClippedAgainstPlane(Vec3(0, 0, 0.1), Vec3(0, 0, 1), triViewed)
-            local clippedTriangles = #clipped
-
-            local i = 0
-            while i < clippedTriangles do
-                i = i + 1
+            local clipped = Triangle_ClipAgainstPlane(Vec3(0, 0, 0.1), Vec3(0, 0, 1), triViewed)
+            local nclippedTriangles = #clipped
+            for i = 1, nclippedTriangles do
+                local triProjected = Triangle()
                 -- project
                 triProjected.p[1] = Matrix_MultiplyVector(matProj, clipped[i].p[1])
                 triProjected.p[2] = Matrix_MultiplyVector(matProj, clipped[i].p[2])
                 triProjected.p[3] = Matrix_MultiplyVector(matProj, clipped[i].p[3])
-
                 triProjected.p[1] = Vector_Div(triProjected.p[1], triProjected.p[1].w)
                 triProjected.p[2] = Vector_Div(triProjected.p[2], triProjected.p[2].w)
                 triProjected.p[3] = Vector_Div(triProjected.p[3], triProjected.p[3].w)
+
+                -- light
+                triProjected.dp = clipped[i].dp
 
                 -- offset
                 local offset = Vec3(1, 1, 0)
@@ -146,13 +144,13 @@ function _G.draw3d()
                 triProjected.p[3].x = triProjected.p[3].x * SCREEN_WIDTH * 0.5
                 triProjected.p[3].y = triProjected.p[3].y * SCREEN_HEIGHT * 0.5
 
-                table.insert(trianglesToDraw, triProjected)
+                table.insert(trianglesToRaster, triProjected)
             end
         end
     end
 
     -- Sort triangle
-    table.sort(trianglesToDraw, function(a, b)
+    table.sort(trianglesToRaster, function(a, b)
         local z1 = (a.p[1].z + a.p[2].z + a.p[3].z) / 3;
 		local z2 = (b.p[1].z + b.p[2].z + b.p[3].z) / 3;
 		return z1 > z2;
@@ -160,19 +158,53 @@ function _G.draw3d()
         end)
 
     -- Render
-    for _, triangle in pairs(trianglesToDraw) do
-        love.graphics.setColor(0 * triangle.dp, 1 * triangle.dp, 0 * triangle.dp)
-        fillPoly({triangle.p[1].x, triangle.p[1].y,
-                  triangle.p[2].x, triangle.p[2].y,
-                  triangle.p[3].x, triangle.p[3].y})
+    for _, triangleToRaster in pairs(trianglesToRaster) do
+        local clipped = {}
+        local Triangles = {}
+        table.insert(Triangles, triangleToRaster)
+        local nNewTriangles = 1
 
-        -- Wireframe object
-        if debugging then
-            love.graphics.setColor(0, 0, 0)
-            drawPoly({triangle.p[1].x, triangle.p[1].y,
-                      triangle.p[2].x, triangle.p[2].y,
-                      triangle.p[3].x, triangle.p[3].y})
+        for p = 0, 3 do
+            while nNewTriangles > 0 do
+                local test = Triangles[1]
+                table.remove(Triangles, 1)
+                nNewTriangles = nNewTriangles - 1
+
+                if p == 0 then
+                    clipped = Triangle_ClipAgainstPlane(Vec3(0, -1, 0), Vec3(0, 1, 0), test)
+                elseif  p == 1 then
+                    clipped = Triangle_ClipAgainstPlane(Vec3(0, SCREEN_HEIGHT, 0), Vec3(0, -1, 0), test)
+                elseif p == 2 then
+                    clipped = Triangle_ClipAgainstPlane(Vec3(1, 0, 0), Vec3(1, 0, 0), test)
+                elseif p == 3 then
+                    clipped = Triangle_ClipAgainstPlane(Vec3(SCREEN_WIDTH, 0, 0), Vec3(-1, 0, 0), test)
+                end
+                local trisToAdd = #clipped
+                --if not pause then
+                --    print(clipped[1])
+                --end
+                for w = 1, trisToAdd do
+                    table.insert(Triangles, clipped[w])
+                    --if w == 2 then
+                    --    print(clipped[w] == clipped[w - 1])
+                    --end
+                end
+            end
+            nNewTriangles = #Triangles
         end
-        love.graphics.setColor(1, 1, 1)
+
+        for _, t in pairs(Triangles) do
+            love.graphics.setColor(0, 1 * t.dp, 0)
+            fillPoly( {t.p[1].x, t.p[1].y,
+                       t.p[2].x, t.p[2].y,
+                       t.p[3].x, t.p[3].y})
+            if debugging then
+                love.graphics.setColor(0, 0, 0)
+                drawPoly( {t.p[1].x, t.p[1].y,
+                t.p[2].x, t.p[2].y,
+                t.p[3].x, t.p[3].y})
+            end
+            love.graphics.setColor(1, 1, 1)
+        end
     end
 end

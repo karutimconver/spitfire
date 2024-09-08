@@ -181,11 +181,12 @@ function Vector_IntersectPlane(plane_p, plane_n, lineStart, lineEnd)
     return Vector_Add(lineStart, lineToIntersect)
 end
 
-function Triangle_ClippedAgainstPlane(plane_p, plane_n, in_tri)
+function Triangle_ClipAgainstPlane(plane_p, plane_n, in_tri)
     plane_n = Vector_Normalise(plane_n)
 
     local dist = function (p)
-        return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - Vector_Dot(plane_n, plane_p))
+        local n = Vector_Normalise(p);
+        return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - Vector_Dot(plane_n, plane_p));
     end
 
     local insidePoints = {}; local insidePointCount = 0
@@ -195,15 +196,12 @@ function Triangle_ClippedAgainstPlane(plane_p, plane_n, in_tri)
     local d2 = dist(in_tri.p[2])
     local d3 = dist(in_tri.p[3])
 
-    if d1 >= 0 then insidePoints[insidePointCount + 1] = in_tri.p[1]; insidePointCount = insidePointCount + 1;
-    else outsidePoints[outsidePointCount + 1] = in_tri.p[1]; outsidePointCount = outsidePointCount + 1
-    end
-    if d2 >= 0 then insidePoints[insidePointCount + 1] = in_tri.p[2]; insidePointCount = insidePointCount + 1
-    else outsidePoints[outsidePointCount + 1] = in_tri.p[1]; outsidePointCount = outsidePointCount + 1
-    end
-    if d3 >= 0 then insidePoints[insidePointCount + 1] = in_tri.p[3]; insidePointCount = insidePointCount + 1
-    else outsidePoints[outsidePointCount + 1] = in_tri.p[1]; outsidePointCount = outsidePointCount + 1
-    end
+    if d1 >= 0 then insidePointCount = insidePointCount + 1; insidePoints[insidePointCount] = in_tri.p[1]
+	else outsidePointCount = outsidePointCount + 1; outsidePoints[outsidePointCount] = in_tri.p[1] end
+	if d2 >= 0 then insidePointCount = insidePointCount + 1; insidePoints[insidePointCount] = in_tri.p[2]
+	else outsidePointCount = outsidePointCount + 1; outsidePoints[outsidePointCount] = in_tri.p[2] end
+	if d3 >= 0 then insidePointCount = insidePointCount + 1; insidePoints[insidePointCount] = in_tri.p[3]
+	else outsidePointCount = outsidePointCount + 1; outsidePoints[outsidePointCount] = in_tri.p[3] end
 
     if insidePointCount == 0 then
         return {}
@@ -217,22 +215,20 @@ function Triangle_ClippedAgainstPlane(plane_p, plane_n, in_tri)
         out_tri.p[2] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[1], outsidePoints[1])
         out_tri.p[3] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[1], outsidePoints[2])
         return {out_tri}
-    elseif insidePoints == 2 and outsidePoints == 1 then
+    elseif insidePointCount == 2 and outsidePointCount == 1 then
         local out_tri1 = Triangle()
         local out_tri2 = Triangle()
 
         out_tri1.dp = in_tri.dp
         out_tri2.dp = in_tri.dp
 
-        out_tri1.p[1] = insidePoints[1]
-        out_tri1.p[2] = insidePoints[2]
-        out_tri1.p[3] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[1], outsidePoints[1])
+        out_tri1.p[1] = insidePoints[1];
+        out_tri1.p[2] = insidePoints[2];
+        out_tri1.p[3] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[1], outsidePoints[1]);
 
-        out_tri2.p[1] = insidePoints[2]
-        out_tri2.p[2] = out_tri1.p[3]
+        out_tri2.p[1] = insidePoints[2];
+        out_tri2.p[2] = out_tri1.p[3];
         out_tri2.p[3] = Vector_IntersectPlane(plane_p, plane_n, insidePoints[2], outsidePoints[1])
-
         return {out_tri1, out_tri2}
     end
-    return {}
 end
