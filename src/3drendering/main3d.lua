@@ -21,8 +21,14 @@ function _G.init3d()
     _G.matProj = Matrix_MakeProjection(FOV, AspectRatio, Near, Far)
 
     _G.Theta = 0
+    
+    -- Rotation Z
+	_G.matRotZ = Matrix_MakeRotationZ(Theta)
 
-    meshCube:loadObjectFile("res/meshes/spitfire2.obj")
+	-- Rotation X
+	_G.matRotX = Matrix_MakeRotationX(Theta * 0.5)
+
+    meshCube:loadObjectFile("res/meshes/mountains.obj")
     --meshCube:loadObjectFile("res/meshes/untitled.obj")
 end
 
@@ -31,12 +37,6 @@ function _G.update3d(dt)
         Camera.y = Camera.y + 8 * dt
     elseif love.keyboard.isDown("s") then
         Camera.y = Camera.y - 8 * dt
-    end
-
-    if love.keyboard.isDown("d") then
-        Camera.x = Camera.x + 8 * dt
-    elseif love.keyboard.isDown("a") then
-        Camera.x = Camera.x - 8 * dt
     end
 
     local forward = Vector_Mul(LookDir, 8 * dt)
@@ -52,12 +52,6 @@ function _G.update3d(dt)
     elseif love.keyboard.isDown("down") then
         Camera = Vector_Sub(Camera, forward)
     end
-
-    -- Rotation Z
-	_G.matRotZ = Matrix_MakeRotationZ(Theta)
-
-	-- Rotation X
-	_G.matRotX = Matrix_MakeRotationX(Theta * 0.5)
 
     _G.matTrans = Matrix_MakeTranslation(0, 0, 18)
 
@@ -78,9 +72,9 @@ end
 function _G.draw3d()
     -- Draw triangle
     local trianglesToRaster = {}
-
+    local max = math.max
     -- Draw
-    for _, triangle in pairs(meshCube.triangles) do
+    for _, triangle in ipairs(meshCube.triangles) do
         local triTransformed = Triangle()
         local triViewed = Triangle()
         -- Rotate
@@ -110,7 +104,7 @@ function _G.draw3d()
             local light_direction = Vec3(0, -1, -1)
             light_direction = Vector_Normalise(light_direction)
 
-            triViewed.dp = math.max(0.1, Vector_Dot(normal, light_direction))
+            triViewed.dp = max(0.1, Vector_Dot(normal, light_direction))
             -- Convert world space into view space
             triViewed.p[1] = Matrix_MultiplyVector(matView, triTransformed.p[1])
             triViewed.p[2] = Matrix_MultiplyVector(matView, triTransformed.p[2])
@@ -158,7 +152,7 @@ function _G.draw3d()
         end)
 
     -- Render
-    for _, triangleToRaster in pairs(trianglesToRaster) do
+    for _, triangleToRaster in ipairs(trianglesToRaster) do
         local clipped = {}
         local Triangles = {}
         table.insert(Triangles, triangleToRaster)
@@ -193,7 +187,7 @@ function _G.draw3d()
             nNewTriangles = #Triangles
         end
 
-        for _, t in pairs(Triangles) do
+        for _, t in ipairs(Triangles) do
             love.graphics.setColor(0, 1 * t.dp, 0)
             fillPoly( {t.p[1].x, t.p[1].y,
                        t.p[2].x, t.p[2].y,
@@ -205,6 +199,7 @@ function _G.draw3d()
                 t.p[3].x, t.p[3].y})
             end
             love.graphics.setColor(1, 1, 1)
+            tris = tris + 1
         end
     end
 end

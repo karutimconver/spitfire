@@ -17,12 +17,15 @@ function love.update(dt)
     if not pause then
         update3d(dt)
     end
+    tris = 0
+    print(love.timer.getFPS())
 end
 
 function love.draw()
     maid64.start()
     love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
     draw3d()
+    love.graphics.print(tris, 10, 10)
     maid64.finish()
 end
 

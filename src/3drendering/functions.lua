@@ -185,7 +185,6 @@ function Triangle_ClipAgainstPlane(plane_p, plane_n, in_tri)
     plane_n = Vector_Normalise(plane_n)
 
     local dist = function (p)
-        local n = Vector_Normalise(p);
         return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - Vector_Dot(plane_n, plane_p));
     end
 
