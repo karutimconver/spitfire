@@ -24,7 +24,7 @@ function maid64.setup(x,y,overscan)
 end
 
 function maid64.start()
-    love.graphics.setCanvas(maid64.canvas)
+    love.graphics.setCanvas({maid64.canvas, depth = true})
     love.graphics.clear()
 end
 

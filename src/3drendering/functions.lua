@@ -69,8 +69,8 @@ function Matrix_MakeTranslation(x, y, z)
     return matrix
 end
 
-function Matrix_MakeProjection(FOV, AspectRatio, Near, Far)
-	local fov = 1.0 / math.tan(math.rad(FOV * 0.5))
+function Matrix_MakeProjection(fov, aspectRatio, near, far)
+	--[[local fov = 1.0 / math.tan(math.rad(FOV * 0.5))
     local matrix = Matrix()
 
     matrix.m[1][1] = AspectRatio * fov
@@ -80,7 +80,17 @@ function Matrix_MakeProjection(FOV, AspectRatio, Near, Far)
 	matrix.m[3][4] = 1.0
 	matrix.m[4][4] = 0.0
 
-    return matrix
+    return matrix]]
+    local top = near * math.tan(fov/2)
+    local bottom = -1*top
+    local right = top * aspectRatio
+    local left = -1*right
+    return {
+        2*near/(right-left), 0, (right+left)/(right-left), 0,
+        0, 2*near/(top-bottom), (top+bottom)/(top-bottom), 0,
+        0, 0, -1*(far+near)/(far-near), -2*far*near/(far-near),
+        0, 0, -1, 0
+    }
 end
 
 function Matrix_MultiplyMatrix(m1, m2)

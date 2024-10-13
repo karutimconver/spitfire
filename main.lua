@@ -4,6 +4,7 @@ require "src/3drendering/main3d"
 
 local love = require("love")
 local maid64 = require("lib/maid64")
+love.graphics.setDefaultFilter("nearest", "nearest")
 
 function love.load()
     maid64.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -18,7 +19,7 @@ function love.update(dt)
         update3d(dt)
     end
     tris = 0
-    print(love.timer.getFPS())
+    --print(love.timer.getFPS())
 end
 
 function love.draw()
