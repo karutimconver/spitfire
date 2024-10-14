@@ -66,8 +66,7 @@ function _G.init3d()
 
     love.graphics.setDepthMode("lequal", true)
     Timer = 0
-    testMesh = Mesh()
-    testMesh:loadObjectFile("res/meshes/spitfire2.obj")
+    testMesh = Mesh("res/meshes/spitfire2.obj", "res/images/icon.png")
     mesh:setTexture(love.graphics.newImage("res/images/icon.png"))
 end
 

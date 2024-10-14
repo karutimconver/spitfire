@@ -1,6 +1,6 @@
 local love = require "love"
 
-function Mesh(triangles)
+function Mesh(mesh, texture)
     local vertexFormat = {
         {"VertexPosition", "float", 3},
         {"VertexTexCoord", "float", 2},
@@ -8,8 +8,7 @@ function Mesh(triangles)
         {"VertexColor", "byte", 4},
     }
 
-    return {
-        triangles = triangles or {},
+    local object =  {
         m = nil,
 
         loadObjectFile = function (self, path)
@@ -55,6 +54,28 @@ function Mesh(triangles)
             end
 
             self.m = love.graphics.newMesh(vertexFormat, vertices, "triangles")
+        end,
+
+        setTexture = function (self, tex)
+            self.m:setTexture(tex)
         end
     }
+
+    if mesh then
+        if type(mesh) == "string" then
+            object:loadObjectFile(mesh)
+        elseif type(mesh) == "table" then
+            object.m = love.graphics.newMesh(vertexFormat, mesh, "triangles")
+        end
+    end
+
+    if texture then
+        if type(texture) == "string" then
+            texture = love.graphics.newImage(texture)
+        end
+
+        object:setTexture(texture)
+    end
+
+    return object
 end
