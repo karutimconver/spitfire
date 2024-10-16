@@ -39,9 +39,9 @@ function Mesh(mesh, texture)
                     local v2 = file_vertices[tonumber(split(data[3], "/")[1])]
                     local v3 = file_vertices[tonumber(split(data[4], "/")[1])]
 
-                    local t1 = file_textureCoords[tonumber(split(data[2], "/")[2])]
-                    local t2 = file_textureCoords[tonumber(split(data[3], "/")[2])]
-                    local t3 = file_textureCoords[tonumber(split(data[4], "/")[2])]
+                    local t1 = file_textureCoords[tonumber(split(data[2], "/")[2])] or {0, 0}
+                    local t2 = file_textureCoords[tonumber(split(data[3], "/")[2])] or {0, 0}
+                    local t3 = file_textureCoords[tonumber(split(data[4], "/")[2])] or {0, 0}
 
                     local n1 = file_normals[tonumber(split(data[2], "/")[3])]
                     local n2 = file_normals[tonumber(split(data[3], "/")[3])]

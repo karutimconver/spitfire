@@ -11,67 +11,37 @@ local FOV = 90.0
 local AspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT
 
 function _G.init3d()
-    local vertexFormat = {
-        {"VertexPosition", "float", 3},
-        {"VertexTexCoord", "float", 2},
-        {"VertexNormal", "float", 3},
-        {"VertexColor", "byte", 4},
-    }
-
-    local verts = {
-        {-1, -1, -1, 0,0},
-        { 1, -1, -1, 1,0},
-        {-1,  1, -1, 0,1},
-        { 1,  1, -1, 1,1},
-        { 1, -1, -1, 1,0},
-        {-1,  1, -1, 0,1},
-
-        {-1, -1,  1, 0,0},
-        { 1, -1,  1, 1,0},
-        {-1,  1,  1, 0,1},
-        { 1,  1,  1, 1,1},
-        { 1, -1,  1, 1,0},
-        {-1,  1,  1, 0,1},
-
-        {-1, -1, -1, 0,0},
-        { 1, -1, -1, 1,0},
-        {-1, -1,  1, 0,1},
-        { 1, -1,  1, 1,1},
-        { 1, -1, -1, 1,0},
-        {-1, -1,  1, 0,1},
-
-        {-1,  1, -1, 0,0},
-        { 1,  1, -1, 1,0},
-        {-1,  1,  1, 0,1},
-        { 1,  1,  1, 1,1},
-        { 1,  1, -1, 1,0},
-        {-1,  1,  1, 0,1},
-
-        {-1, -1, -1, 0,0},
-        {-1,  1, -1, 1,0},
-        {-1, -1,  1, 0,1},
-        {-1,  1,  1, 1,1},
-        {-1,  1, -1, 1,0},
-        {-1, -1,  1, 0,1},
-
-        { 1, -1, -1, 0,0},
-        { 1,  1, -1, 1,0},
-        { 1, -1,  1, 0,1},
-        { 1,  1,  1, 1,1},
-        { 1,  1, -1, 1,0},
-        { 1, -1,  1, 0,1},
-    }
-
-    mesh = love.graphics.newMesh(vertexFormat, verts, "triangles")
-
     love.graphics.setDepthMode("lequal", true)
     Timer = 0
-    testMesh = Mesh("res/meshes/spitfire2.obj", "res/images/icon.png")
-    mesh:setTexture(love.graphics.newImage("res/images/icon.png"))
+    _G.mesh = Mesh("res/meshes/spitfire.obj", "res/images/icon.png")
+    _G.Camera = cpml.vec3.new(0, 0, 0)
 end
 
 function _G.update3d(dt)
-    Timer = Timer + dt
+    --Timer = Timer + dt
+
+    if love.keyboard.isDown("a") then
+        Camera.x = Camera.x + 8 * dt
+    end
+    if love.keyboard.isDown("d") then
+        Camera.x = Camera.x - 8 * dt
+    end
+
+    if love.keyboard.isDown("w") then
+        Camera.z = Camera.z + 8 * dt
+    end
+
+    if love.keyboard.isDown("s") then
+        Camera.z = Camera.z - 8 * dt
+    end
+
+    if love.keyboard.isDown("space") then
+        Camera.y = Camera.y + 8 * dt
+    end
+
+    if love.keyboard.isDown("b") then
+        Camera.y = Camera.y - 8 * dt
+    end
 
     local scale = cpml.mat4.scale(cpml.mat4.identity(), cpml.mat4.identity(), cpml.vec3.new(1, 1, 1))
 
@@ -84,11 +54,12 @@ end
 
 function _G.draw3d()
     love.graphics.setShader(shader)
+    shader:send("usingCanvas", true)
     shader:send("projectionMatrix", "column", cpml.mat4.from_perspective(FOV, AspectRatio, Near, Far))
     -- Cuidado com esta matrix!
-    shader:send("viewMatrix", "column", cpml.mat4.look_at(cpml.mat4.new(), cpml.vec3.new(0, 0, 0), cpml.vec3.new(0, 0, 1), cpml.vec3.new(0, 1, 0)))
+    shader:send("viewMatrix", "column", cpml.mat4.look_at(cpml.mat4.new(), cpml.vec3.new(Camera.x, Camera.y, Camera.z), cpml.vec3.new(Camera.x, Camera.y, Camera.z + 1), cpml.vec3.new(0, 1, 0)))
     shader:send("objectMatrix", "column", model)
 
-    love.graphics.draw(testMesh.m)
+    love.graphics.draw(mesh.m)
     love.graphics.setShader()
 end
