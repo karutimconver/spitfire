@@ -4,6 +4,7 @@ require "src/3drendering/main3d"
 
 local love = require("love")
 local maid64 = require("lib/maid64")
+local cpml = require("lib/cpml")
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 function love.load()

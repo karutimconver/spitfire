@@ -4,12 +4,13 @@ local shader = love.graphics.newShader([[
     uniform mat4 projectionMatrix;
     uniform mat4 objectMatrix;
     uniform mat4 viewMatrix;
+
     uniform bool usingCanvas;
-
+    
     varying vec4 vertexColor;
-    varying vec4 vertexNormal;
-
+    
     #ifdef VERTEX
+        attribute vec3 VertexNormal;
         vec4 position(mat4 transform_projection, vec4 vertex_position)
         {
             vertexColor = VertexColor;
@@ -28,7 +29,8 @@ local shader = love.graphics.newShader([[
         {
             vec4 texcolor = Texel(tex, vec2(texcoord.x, 1-texcoord.y));
             if (texcolor.a == 0.0) { discard; }
-            return vec4(texcolor)*color*vertexColor;
+
+            return texcolor*color*vertexColor;
         }
     #endif
 ]])

@@ -10,6 +10,7 @@ function Mesh(mesh, texture)
 
     local object =  {
         m = nil,
+        texture = nil,
 
         loadObjectFile = function (self, path)
             assert(function() return love.filesystem.getInfo(path) ~= nil end, "Couldn't load mesh \"" .. path .. "\" file not found!")
@@ -35,17 +36,21 @@ function Mesh(mesh, texture)
                 elseif data[1] == "vn" then
                     table.insert(file_normals, {data[2], data[3], data[4]})
                 elseif data[1] == "f" then
-                    local v1 = file_vertices[tonumber(split(data[2], "/")[1])]
-                    local v2 = file_vertices[tonumber(split(data[3], "/")[1])]
-                    local v3 = file_vertices[tonumber(split(data[4], "/")[1])]
+                    local d1 = split(data[2], "/")
+                    local d2 = split(data[3], "/")
+                    local d3 = split(data[4], "/")
 
-                    local t1 = file_textureCoords[tonumber(split(data[2], "/")[2])] or {0, 0}
-                    local t2 = file_textureCoords[tonumber(split(data[3], "/")[2])] or {0, 0}
-                    local t3 = file_textureCoords[tonumber(split(data[4], "/")[2])] or {0, 0}
+                    local v1 = file_vertices[tonumber(d1[1])]
+                    local v2 = file_vertices[tonumber(d2[1])]
+                    local v3 = file_vertices[tonumber(d3[1])]
 
-                    local n1 = file_normals[tonumber(split(data[2], "/")[3])]
-                    local n2 = file_normals[tonumber(split(data[3], "/")[3])]
-                    local n3 = file_normals[tonumber(split(data[4], "/")[3])]
+                    local t1 = file_textureCoords[tonumber(d1[2])] or {0, 0}
+                    local t2 = file_textureCoords[tonumber(d2[2])] or {0, 0}
+                    local t3 = file_textureCoords[tonumber(d3[2])] or {0, 0}
+
+                    local n1 = file_normals[tonumber(d1[#d1])] or {0, 0, 0}
+                    local n2 = file_normals[tonumber(d2[#d2])] or {0, 0, 0}
+                    local n3 = file_normals[tonumber(d3[#d3])] or {0, 0, 0}
 
                     table.insert(vertices, {v1[1],v1[2],v1[3],   t1[1],t1[2],    unpack(n1)})
                     table.insert(vertices, {v2[1],v2[2],v2[3],   t2[1],t2[2],    unpack(n2)})
@@ -57,6 +62,7 @@ function Mesh(mesh, texture)
         end,
 
         setTexture = function (self, tex)
+            self.texture = tex
             self.m:setTexture(tex)
         end
     }
