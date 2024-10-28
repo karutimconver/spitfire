@@ -1,23 +1,31 @@
+require "src/player"
 require "src/globals"
 require "src/draw/draw"
 require "src/3drendering/main3d"
 
-local love = require("love")
-local maid64 = require("lib/maid64")
-local cpml = require("lib/cpml")
+local love = require "love"
+local maid64 = require "lib/maid64"
+local cpml = require "lib/cpml"
+
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 function love.load()
     maid64.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
     init3d()
     _G.pause = false
+    _G.player = Player()
 end
 
 function love.update(dt)
     --print(love.graphics.getWidth())
     --print(love.graphics.getHeight())
     if not pause then
-        update3d(dt)
+        if debugging then
+            update3d(dt)
+        else
+            player:update(dt)
+            update3d(dt, player)
+        end
     end
     --print(love.timer.getFPS())
 end

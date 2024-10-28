@@ -19,6 +19,7 @@ local shader = love.graphics.newShader([[
             if (usingCanvas) {
                 vertexPosition.y = -vertexPosition.y;
             }
+            vertexPosition.x = -vertexPosition.x;
             
             return vertexPosition;
         }

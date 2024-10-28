@@ -7,6 +7,7 @@ function love.conf(t)
     t.window.icon = "res/images/icon.png"
     t.window.title = "Spitfire"
 
+    t.window.depth = 16
     t.window.width = 960
     t.window.height = 540
     t.window.fullscreen = fullscreen

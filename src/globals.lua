@@ -5,6 +5,12 @@ _G.debugging = true
 
 _G.fullscreen = false
 
+
+function _G.round(val)
+    return math.floor(val + 0.5)
+end
+
+-- Utility functions found on stackoverflow
 function _G.copy(obj, seen)
     if type(obj) ~= 'table' then return obj end
     if seen and seen[obj] then return seen[obj] end
@@ -13,10 +19,6 @@ function _G.copy(obj, seen)
     s[obj] = res
     for k, v in pairs(obj) do res[copy(k, s)] = copy(v, s) end
     return res
-end
-
-function _G.round(val)
-    return math.floor(val + 0.5)
 end
 
 function _G.split (inputstr, sep)
