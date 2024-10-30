@@ -5,21 +5,20 @@ require "src/3drendering/main3d"
 
 local love = require "love"
 local maid64 = require "lib/maid64"
-local cpml = require "lib/cpml"
+local game = require "src/game"
 
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 function love.load()
     maid64.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
     init3d()
-    _G.pause = false
     _G.player = Player()
 end
 
 function love.update(dt)
     --print(love.graphics.getWidth())
     --print(love.graphics.getHeight())
-    if not pause then
+    if game:checkState("running") then
         if debugging then
             update3d(dt)
         else
@@ -44,7 +43,7 @@ function love.keypressed(key)
         love.window.setFullscreen(fullscreen)
     end
     if key == "p" then
-        _G.pause = not pause
+        game:setState("running")
     end
 end
 
