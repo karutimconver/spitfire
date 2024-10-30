@@ -28,9 +28,11 @@ end
 
 function love.draw()
     maid64.start()
-    love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
-    draw3d()
-    love.graphics.print(love.timer.getFPS(), 10, 10)
+    if game:checkState("running") then
+        love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
+        draw3d()
+        love.graphics.print(love.timer.getFPS(), 10, 10)
+    end
     maid64.finish()
 end
 
@@ -40,7 +42,11 @@ function love.keypressed(key)
         love.window.setFullscreen(FULLSCREEN)
     end
     if key == "p" then
-        game:setState("running")
+        if game:checkState("pause") then
+            game:setState("running")
+        else
+            game:setState("pause")
+        end
     end
 end
 
