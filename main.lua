@@ -16,17 +16,14 @@ function love.load()
 end
 
 function love.update(dt)
-    --print(love.graphics.getWidth())
-    --print(love.graphics.getHeight())
     if game:checkState("running") then
-        if debugging then
+        if DEBBUGGING then
             update3d(dt)
         else
             player:update(dt)
             update3d(dt, player)
         end
     end
-    --print(love.timer.getFPS())
 end
 
 function love.draw()
@@ -39,8 +36,8 @@ end
 
 function love.keypressed(key)
     if key == "f11" then
-        _G.fullscreen = not fullscreen
-        love.window.setFullscreen(fullscreen)
+        FULLSCREEN = not FULLSCREEN
+        love.window.setFullscreen(FULLSCREEN)
     end
     if key == "p" then
         game:setState("running")

@@ -1,9 +1,9 @@
 _G.SCREEN_WIDTH = 480 -- 1920
 _G.SCREEN_HEIGHT = 270 --1080
 
-_G.debugging = true
+_G.DEBBUGGING = true
 
-_G.fullscreen = false
+_G.FULLSCREEN = false
 
 
 function _G.round(val)
