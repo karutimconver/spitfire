@@ -14,7 +14,7 @@ local AspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT
 function _G.init3d()
     love.graphics.setDepthMode("lequal", true)
     Timer = 0
-    _G.mesh = Mesh("res/meshes/spitfire2.obj", "res/images/spitfire textures/DiffuseSpitfire.png")
+    _G.mesh = Mesh("res/meshes/mountains.obj", "res/images/spitfire textures/noise.png")
     _G.Camera = cpml.vec3.new(0, 0, 0)
     _G.right = cpml.vec3.new(1, 0, 0)
     _G.up = cpml.vec3.new(0, 1, 0)
