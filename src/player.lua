@@ -8,9 +8,9 @@ function Player(pos)
         right = cpml.vec3.new(1, 0, 0),
         up = cpml.vec3.new(0, 1, 0),
 
-        speed = 25,
+        speed = 15,
 
-        move = function(self, dt)
+        controls = function (self, dt)
             if love.keyboard.isDown("left") then
                 self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.up))
                 self.right = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.right))
@@ -30,8 +30,13 @@ function Player(pos)
                 self.forward = cpml.vec3.normalize(cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.forward)))
                 self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.up))
             end
+        end,
+
+        move = function(self, dt)
+            self:controls(dt)
 
             self.position = cpml.vec3.add(self.position, cpml.vec3.mul(self.forward, cpml.vec3.new(self.speed * dt, self.speed * dt, self.speed * dt)))
+            --self.position = cpml.vec3.add(self.position, cpml.vec3.new(-math.cos(self.right.x * math.pi / 2), 0, math.sin(self.right.z * math.pi / 2)))
         end,
 
         update = function(self, dt)
