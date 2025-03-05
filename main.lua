@@ -19,10 +19,10 @@ end
 function love.update(dt)
     if game:checkState("running") then
         if DEBBUGGING then
-            update3d(dt)
-        else
             player:update(dt)
             update3d(dt, player)
+        else
+            update3d(dt)
         end
     end
 end

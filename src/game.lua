@@ -1,6 +1,23 @@
 require "src/globals"
+local enet = require "enet"
+
 local states = {"running", "menu", "pause"}
 local isHost = false
+
+_G.Server = {
+    create = function (self)
+        isHost = true
+        self.host = enet.host_create("127.0.0.1:8888")
+    end,
+
+    update = function (self)
+        local event = self.host:service(100)
+        if event and event.type == "receive" then
+          print("Got message: ", event.data, event.peer)
+          event.peer:send(event.data)
+        end
+    end
+}
 
 local game = {
     state = "running",
@@ -19,7 +36,7 @@ local game = {
 
     update = function (self, state)
         if isHost then
-            -- game server code 
+            -- game server code
         else
             -- game client code
         end
