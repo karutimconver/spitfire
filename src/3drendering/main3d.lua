@@ -22,7 +22,6 @@ function _G.init3d()
 
     shader:send("usingCanvas", true)
     shader:send("projectionMatrix", "column", cpml.mat4.from_perspective(FOV, AspectRatio, Near, Far))
-
 end
 
 function _G.update3d(dt, player)
@@ -88,7 +87,11 @@ function _G.update3d(dt, player)
     local roty = cpml.mat4.rotate(cpml.mat4.identity(), rotx, 0, cpml.vec3.new(0, 1, 0))
     local rotz = cpml.mat4.rotate(cpml.mat4.identity(), roty, 0, cpml.vec3.new(0, 0, 1))
 
+<<<<<<< Updated upstream
     _G.model = cpml.mat4.translate(cpml.mat4.identity(), rotz, cpml.vec3.new(0, 0, 16))
+=======
+    _G.modelMatrix = cpml.mat4.translate(cpml.mat4.identity(), rotz, cpml.vec3.new(0, 0, 0))
+>>>>>>> Stashed changes
 end
 
 function _G.draw3d()
