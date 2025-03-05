@@ -8,9 +8,9 @@ function Player(pos)
         right = cpml.vec3.new(1, 0, 0),
         up = cpml.vec3.new(0, 1, 0),
 
-        speed = 25,
+        speed = 15,
 
-        move = function(self, dt)
+        controls = function (self, dt)
             if love.keyboard.isDown("left") then
                 self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.up))
                 self.right = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.right))
@@ -30,6 +30,10 @@ function Player(pos)
                 self.forward = cpml.vec3.normalize(cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.forward)))
                 self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.up))
             end
+        end,
+
+        move = function(self, dt)
+            self:controls(dt)
 
             -- projetar o vetor right para o plano Oxz
             local p_right = cpml.vec3.normalize(cpml.vec3.new(self.right.x, 0, self.right.z))
