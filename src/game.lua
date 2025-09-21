@@ -1,7 +1,6 @@
 require "src/globals"
 local enet = require "enet"
 
-local states = {"running", "menu", "pause"}
 local isHost = false
 
 _G.Server = {
@@ -13,12 +12,17 @@ _G.Server = {
     update = function (self)
         local event = self.host:service(100)
         if event and event.type == "receive" then
-          print("Got message: ", event.data, event.peer)
-          event.peer:send(event.data)
+            print("Got message: ", event.data, event.peer)
+            event.peer:send(event.data)
         end
     end
 }
 
+_G.gameStates = {menu = 0,
+lobby = 1,
+running = 2}
+
+local states = {"running", "menu", "pause", "lobby"}
 local game = {
     state = "running",
 

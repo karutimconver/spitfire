@@ -29,11 +29,19 @@ end
 
 function love.draw()
     maid64.start()
-    --if game:checkState("running") then
+
+    if game:checkState("menu") then
         love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
-        draw3d()
-        love.graphics.print(love.timer.getFPS(), 10, 10)
-    --end
+    elseif game:checkState("lobby") then
+        love.graphics.clear(0, 0, 0, 1)
+    else
+        --if game:checkState("running") then
+            love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
+            draw3d()
+            love.graphics.print(love.timer.getFPS(), 10, 10)
+        --end
+    end
+
     maid64.finish()
 end
 
