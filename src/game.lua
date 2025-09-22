@@ -1,7 +1,9 @@
-require "src/player"
 require "src/globals"
 require "src/draw/draw"
 require "src/3drendering/main3d"
+local Player = require "src/player"
+local Button = require "src/UI/button"
+local bt = Button(100, 100, 20, 20)
 
 local maid64 = require "lib/maid64"
 local enet = require "enet"
@@ -31,7 +33,7 @@ running = 2}
 
 local states = {"running", "menu", "pause", "lobby"}
 local game = {
-    state = "running",
+    state = "menu",
 
     setState = function (self, state)
         assert(table.contains(states, state), "Invalid game state \"" .. state .. "\"!")
@@ -67,6 +69,7 @@ local game = {
 
         if self:checkState("menu") then
             love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
+            bt:draw()
         elseif self:checkState("lobby") then
             love.graphics.clear(0, 0, 0, 1)
         else
@@ -78,6 +81,12 @@ local game = {
         end
 
         maid64.finish()
+    end,
+
+    mousepressed = function(self, x, y, button, istouch, presses )
+        if bt:checkHover() then
+            bt:clicked()
+        end
     end,
 
     keypress = function(self, key)

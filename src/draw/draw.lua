@@ -39,7 +39,9 @@ function _G.drawRect(x, y, width, height, center)
     end
 end
 
-function _G.fillRect(x, y, width, height, center)
+function _G.fillRect(x, y, width, height, center, color)
+    love.graphics.setColor(color or {1, 1, 1, 1})
+
     if center then
         love.graphics.rectangle("fill", x - width / 2, y - height / 2, width, height)
     else
@@ -47,6 +49,7 @@ function _G.fillRect(x, y, width, height, center)
     end
 
     drawRect(x, y,width, height, center)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function _G.drawCircle(x, y, radius)

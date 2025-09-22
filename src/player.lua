@@ -1,7 +1,7 @@
 local cpml = require("lib/cpml")
 local love = require "love"
 
-function Player(pos)
+local function Player(pos)
     local object = {
         position = pos or cpml.vec3.new(0, 0, 0),
         forward = cpml.vec3.new(0, 0, 1),
@@ -63,3 +63,5 @@ function Player(pos)
 
     return object
 end
+
+return Player
