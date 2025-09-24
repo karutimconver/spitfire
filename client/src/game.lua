@@ -10,23 +10,6 @@ local enet = require "enet"
 local love = require "love"
 local cpml = require "lib/cpml"
 
-local isHost = false
-
-_G.Server = {
-    create = function (self)
-        isHost = true
-        self.host = enet.host_create("127.0.0.1:8888")
-    end,
-
-    update = function (self)
-        local event = self.host:service(100)
-        if event and event.type == "receive" then
-            print("Got message: ", event.data, event.peer)
-            event.peer:send(event.data)
-        end
-    end
-}
-
 _G.gameStates = {menu = 0,
 lobby = 1,
 running = 2}
