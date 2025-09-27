@@ -3,25 +3,22 @@ require "src/draw/draw"
 require "src/3drendering/main3d"
 local Player = require "src/player"
 local Button = require "src/UI/button"
---local bt = Button(100, 100, 20, 20)
 
 local maid64 = require "lib/maid64"
 local enet = require "enet"
 local love = require "love"
 local cpml = require "lib/cpml"
 
-_G.gameStates = {menu = 0,
-lobby = 1,
-running = 2}
-
 local states = {"running", "menu", "pause", "lobby"}
 local game = {
     state = "menu",
-    buttons = {
-        menu = {
-            Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20, function () print("pila") end, "pila")
-        }
-    },
+
+    connect = function (self)
+        self:setState("lobby")
+
+        self.enetclient = enet.host_create()
+        self.clientpeer = self.enetclient:connect("localhost:6750")
+    end,
 
     setState = function (self, state)
         assert(table.contains(states, state), "Invalid game state \"" .. state .. "\"!")
@@ -39,6 +36,18 @@ local game = {
         maid64.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
         init3d()
         _G.player = Player()
+
+        self.buttons = {
+            menu = {
+                Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20, "connect", "pila")
+            },
+            lobby = {}
+        }
+
+        self.functions = {
+            ["no func"] = function (self) print("no function!") end,
+            connect = self.connect
+        }
     end,
 
     update = function (self, dt)
@@ -49,6 +58,18 @@ local game = {
             else
                 update3d(dt)
             end
+
+        end
+
+        if self.enetclient then
+            local event = self.enetclient:service(0)
+            while event do
+                if event.type == "receive" then
+                    self.clientpeer:send("ping")
+                    print("Received: " .. event.data)
+                end
+                event = self.enetclient:service()
+            end
         end
     end,
 
@@ -57,7 +78,6 @@ local game = {
 
         if self:checkState("menu") then
             love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
-            --bt:draw()
         elseif self:checkState("lobby") then
             love.graphics.clear(0, 0, 0, 1)
         else
@@ -68,7 +88,7 @@ local game = {
             --end
         end
 
-        for _, b in pairs(self.buttons["menu"]) do
+        for _, b in pairs(self.buttons[self.state]) do
             b:draw()
         end
 
@@ -76,12 +96,8 @@ local game = {
     end,
 
     mousepressed = function(self, x, y, button, istouch, presses )
-        --if bt:checkHover() then
-        --    bt:clicked()
-        --end
-
         for _, b in pairs(self.buttons["menu"]) do
-            b:clicked()
+            self.functions[b.func](self)
         end
     end,
 

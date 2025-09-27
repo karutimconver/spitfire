@@ -9,7 +9,7 @@ local function Button(x, y, width, height, func, text, color, text_color, hover_
 
     return {
         text = text or "no text!",
-        func = func or function () print("pressed!") end,
+        func = func or "no func",
         x = x,
         y = y,
         width = width,
@@ -27,14 +27,6 @@ local function Button(x, y, width, height, func, text, color, text_color, hover_
             end
 
             return false
-        end,
-
-        clicked = function (self, args)
-            if args then
-                self.func(unpack(args))
-            else
-                self.func()
-            end
         end,
 
         draw = function (self)
