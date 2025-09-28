@@ -41,7 +41,6 @@ local game = {
             menu = {
                 Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20, "connect", "pila")
             },
-            lobby = {}
         }
 
         self.functions = {
@@ -58,7 +57,6 @@ local game = {
             else
                 update3d(dt)
             end
-
         end
 
         if self.enetclient then
@@ -88,16 +86,20 @@ local game = {
             --end
         end
 
-        for _, b in pairs(self.buttons[self.state]) do
-            b:draw()
+        if self.buttons[self.state] then
+            for _, b in pairs(self.buttons[self.state]) do
+                b:draw()
+            end
         end
 
         maid64.finish()
     end,
 
     mousepressed = function(self, x, y, button, istouch, presses )
-        for _, b in pairs(self.buttons["menu"]) do
-            self.functions[b.func](self)
+        if self.buttons[self.state] then
+            for _, b in pairs(self.buttons[self.state]) do
+                self.functions[b.func](self)
+            end
         end
     end,
 
