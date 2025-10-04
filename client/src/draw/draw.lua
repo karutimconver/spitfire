@@ -167,7 +167,7 @@ function _G.drawText(text, x, y, color)
 
     local lenght = (l * w) + (l - 1)
 
-    local glyph_x = x - math.floor(lenght / 2) + 1
+    local glyph_x = math.floor(x + 0.5) - math.floor(lenght / 2) + 1
 
     for glyph in text:gmatch(".") do
         drawGlyph(glyph, glyph_x, y, c)

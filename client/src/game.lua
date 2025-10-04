@@ -3,7 +3,9 @@ require "src/draw/draw"
 require "src/3drendering/main3d"
 local Player = require "src/player"
 local Button = require "src/UI/button"
+local InputBox = require "src/UI/inputbox"
 
+local ib = InputBox(50, 50, 10, "")
 local maid64 = require "lib/maid64"
 local enet = require "enet"
 local love = require "love"
@@ -76,6 +78,7 @@ local game = {
 
         if self:checkState("menu") then
             love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
+            ib:draw()
         elseif self:checkState("lobby") then
             love.graphics.clear(0, 0, 0, 1)
         else
@@ -98,17 +101,20 @@ local game = {
     mousepressed = function(self, x, y, button, istouch, presses )
         if self.buttons[self.state] then
             for _, b in pairs(self.buttons[self.state]) do
-                self.functions[b.func](self)
+                if b:checkHover() then
+                    self.functions[b.func](self)
+                end
             end
         end
     end,
 
     keypress = function(self, key)
+        ib:input(key)
         if key == "f11" then
             FULLSCREEN = not FULLSCREEN
             love.window.setFullscreen(FULLSCREEN)
         end
-        if key == "p" then
+        --[[[if key == "p" then
             if self:checkState("pause") then
                 self:setState("running")
             else
@@ -129,7 +135,7 @@ local game = {
             print(view[5], view[6], view[7], view[8])
             print(view[9], view[10], view[11], view[12])
             print(view[13], view[14], view[15], view[16])
-        end
+        end]]
     end
 }
 

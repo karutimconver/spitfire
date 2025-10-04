@@ -21,8 +21,8 @@ local function Button(x, y, width, height, func, text, color, text_color, hover_
             local x = love.mouse.getX() / love.graphics.getWidth() * SCREEN_WIDTH
             local y = love.mouse.getY() / love.graphics.getHeight() * SCREEN_HEIGHT
 
-            if self.x - self.width / 2 < x and x < self.x + self.width / 2 and 
-               self.y - self.height / 2 < y and y < self.y + self.height / 2 then
+            if self.x - self.width / 2 - 1 < x and x < self.x + self.width / 2 and 
+               self.y - self.height / 2 - 1 < y and y < self.y + self.height / 2 then
                     return true
             end
 

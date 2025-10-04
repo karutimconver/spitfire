@@ -2,14 +2,14 @@ require "src/globals"
 
 local love = require "love"
 local draw = require "src/draw/draw"
-local letters = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"}
+local sSimbols = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", " ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
 
 local function inputBox(x, y, max_length, text)
     return {
         x = x,
         y = y,
-        width = max_length * 3 + max_length - 1,
-        text = text,
+        width = max_length * 3 + max_length,
+        text = text or "",
 
         input = function (self, key)
             if key == "backspace" then
@@ -20,7 +20,7 @@ local function inputBox(x, y, max_length, text)
             end
 
             if #self.text < max_length then
-                if table.contains(letters, key) then
+                if table.contains(sSimbols, key) then
                     self.text = self.text .. key
                 end
             end
@@ -30,8 +30,7 @@ local function inputBox(x, y, max_length, text)
 
         draw = function (self)
             drawLine(self.x-self.width/2, self.y+4, self.x+self.width/2, self.y+4)
-
-
+            drawText(self.text, self.x, self.y)
         end
     }
 end
