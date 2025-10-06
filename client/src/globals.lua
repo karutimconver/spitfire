@@ -41,6 +41,18 @@ function _G.split (inputstr, sep)
     return false
 end
 
+function table.keys(table)
+  local n = 0
+  local keyset = {}
+
+  for k,_ in pairs(table) do
+    n=n+1
+    keyset[n]=k
+  end
+
+  return keyset{}
+end
+
 function pprint (value , call_indent)
     if not call_indent then
       call_indent = ""

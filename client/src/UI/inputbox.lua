@@ -1,8 +1,9 @@
 require "src/globals"
+require "src/draw/draw"
 
 local love = require "love"
-local draw = require "src/draw/draw"
 local sSimbols = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", " ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
+local cSimbols = {"=", ".", "!", "?", "-", "_", "$"}
 
 local function inputBox(x, y, max_length, text)
     return {
@@ -22,6 +23,8 @@ local function inputBox(x, y, max_length, text)
             if #self.text < max_length then
                 if table.contains(sSimbols, key) then
                     self.text = self.text .. key
+                elseif table.contains(cSimbols, key) then
+                    
                 end
             end
 
