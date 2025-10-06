@@ -50,7 +50,7 @@ function table.keys(table)
     keyset[n]=k
   end
 
-  return keyset{}
+  return keyset
 end
 
 function pprint (value , call_indent)
