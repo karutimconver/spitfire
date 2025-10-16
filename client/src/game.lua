@@ -5,7 +5,6 @@ local Player = require "src/player"
 local Button = require "src/UI/button"
 local InputBox = require "src/UI/inputbox"
 
-local ib = InputBox(50, 50, 10, "")
 local maid64 = require "lib/maid64"
 local enet = require "enet"
 local love = require "love"
@@ -16,7 +15,7 @@ local game = {
     state = "menu",
 
     connect = function (self)
-        self:setState("lobby")
+        self:setState("running")
 
         self.enetclient = enet.host_create()
         self.clientpeer = self.enetclient:connect("localhost:6750")
@@ -78,7 +77,6 @@ local game = {
 
         if self:checkState("menu") then
             love.graphics.clear(12 / 255, 120 / 255, 255 / 255, 1)
-            ib:draw()
         elseif self:checkState("lobby") then
             love.graphics.clear(0, 0, 0, 1)
         else
@@ -109,7 +107,6 @@ local game = {
     end,
 
     keypress = function(self, key)
-        ib:input(key)
         if key == "f11" then
             FULLSCREEN = not FULLSCREEN
             love.window.setFullscreen(FULLSCREEN)

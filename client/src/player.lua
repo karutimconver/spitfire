@@ -7,6 +7,11 @@ local function Player(pos)
         forward = cpml.vec3.new(0, 0, 1),
         right = cpml.vec3.new(1, 0, 0),
         up = cpml.vec3.new(0, 1, 0),
+        velocity = cpml.vec3.new(0, 0, 15),
+        airfoils = {
+            {area = 40,
+             length = 20}
+        },
 
         speed = 15,
 
@@ -54,6 +59,8 @@ local function Player(pos)
             print(p_up)
             self.position = cpml.vec3.add(self.position, cpml.vec3.mul(self.forward, cpml.vec3.new(self.speed * dt, self.speed * dt, self.speed * dt)))
             self.position = cpml.vec3.add(self.position, cpml.vec3.mul(p_up, cpml.vec3.new(dt * 20, dt * 20, dt * 20)))
+
+            --[[   Novo Método    ]]
         end,
 
         update = function(self, dt)
