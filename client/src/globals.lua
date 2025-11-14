@@ -53,7 +53,7 @@ function table.keys(table)
   return keyset
 end
 
-function pprint (value , call_indent)
+function dump (value , call_indent)
     if not call_indent then
       call_indent = ""
     end
@@ -72,7 +72,7 @@ function pprint (value , call_indent)
             first = false
           end
           output = output .. "\n" .. indent
-          output = output  .. inner_key .. " = " .. pprint ( inner_value, indent ) 
+          output = output  .. inner_key .. " = " .. dump ( inner_value, indent ) 
         end
         output = output ..  "\n" .. call_indent .. "}"
 
