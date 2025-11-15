@@ -3,7 +3,9 @@ local MASS = 1000
 local WEIGHT = G*MASS
 local AIR_DENSITY = 0.4582725
 local AspectRatio =  5.61
-local e = 0.85
+local e = 0.85 -- Oswald efficiency factor
+local n = 0.8 -- flap effectiveness factor
+local t = 0.24 -- flap cord fraction
 
 local function calculateLiftCoefficient(AoA, airfoil)
     --Lift curve slope
@@ -18,15 +20,22 @@ local function calculateLiftCoefficient(AoA, airfoil)
     local Cl = a * (AoAr - AoA0)
 
     if airfoil.flap then
-        
+        local deflection = math.rad(airfoil.flap.deflection)
+        Cl = Cl + a*n*t*deflection
     end
 
     return Cl
 end
 
-airfoil = {ZeroLiftAoA = -2.6}
+local function calculateDragCoefficients(AoA, airfoil)
+end
+
+airfoil1 = {ZeroLiftAoA = -2.6, flap = {deflection = -30},}
+airfoil2 = {ZeroLiftAoA = -2.6, flap = {deflection = 30},}
+airfoil3 = {ZeroLiftAoA = -2.6}
+
 for i = -5, 5, 0.5 do    
-    print("Cl at "..i.." AoA: ".. calculateLiftCoefficient(i, airfoil))
+    print("Cl at "..i.." AoA: ".. calculateLiftCoefficient(i, airfoil3))
 end
 
 local function compute_CL_and_stats(airfoil, aoa_start_deg, aoa_end_deg, step_deg)
@@ -81,4 +90,6 @@ local function compute_CL_and_stats(airfoil, aoa_start_deg, aoa_end_deg, step_de
 end
 
 -- Example usage:
-local stats = compute_CL_and_stats(airfoil, -5, 5, 0.5)
+local stats = compute_CL_and_stats(airfoil3, -5, 5, 0.5)
+local stats = compute_CL_and_stats(airfoil2, -5, 5, 0.5)
+local stats = compute_CL_and_stats(airfoil1, -5, 5, 0.5)
