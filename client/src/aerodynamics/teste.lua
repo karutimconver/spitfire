@@ -10,6 +10,25 @@ local t = 0.24 -- flap cord fraction
 local function calculateLiftCoefficient(AoA, airfoil)
     --Lift curve slope
     local AoAr = math.rad(AoA)
+
+    -- 2D and finite-wing lift curve slopes
+    local a0 = 2 * math.pi
+    -- local a = 1 * a0 / (1 + (a0 / (math.pi * AspectRatio * e)))
+
+    -- Compute CL (linear region)
+    local Cl = airfoil.Cl0 + a0 * (AoAr)
+    local dCl = 0
+    if airfoil.flap then
+        local deflection = math.rad(airfoil.flap.deflection)
+        local dCl = a0*n*t*deflection
+        Cl = Cl + a0*n*t*deflection
+    end
+
+    return Cl, dCl
+end
+
+local function calculateDragCoefficient(AoA, airfoil, dCl)
+    local AoAr = math.rad(AoA)
     local AoA0 = math.rad(airfoil.ZeroLiftAoA)
 
     -- 2D and finite-wing lift curve slopes
@@ -18,25 +37,29 @@ local function calculateLiftCoefficient(AoA, airfoil)
 
     -- Compute CL (linear region)
     local Cl = a * (AoAr - AoA0)
-
+    local dCl = 0
     if airfoil.flap then
         local deflection = math.rad(airfoil.flap.deflection)
+        local dCl = a*n*t*deflection
         Cl = Cl + a*n*t*deflection
     end
 
-    return Cl
+    local k = 1 / (math.pi*e*AspectRatio)
+
+    
 end
 
-local function calculateDragCoefficients(AoA, airfoil)
+local function calculateCoefficients(AoA, airfoil)
+    local Cl, dCl = calculateLiftCoefficient(AoA, airfoil)
+
+    local Cd = calculateDragCoefficient(AoA, airfoil, dCl)
+
+    return Cl, Cd
 end
 
-airfoil1 = {ZeroLiftAoA = -2.6, flap = {deflection = -30},}
-airfoil2 = {ZeroLiftAoA = -2.6, flap = {deflection = 30},}
-airfoil3 = {ZeroLiftAoA = -2.6}
-
-for i = -5, 5, 0.5 do    
-    print("Cl at "..i.." AoA: ".. calculateLiftCoefficient(i, airfoil3))
-end
+airfoil1 = {Cl0 = 0.21, ZeroLiftAoA = -2.6, flap = {deflection = -30},}
+airfoil2 = {Cl0 = 0.21, ZeroLiftAoA = -2.6, flap = {deflection = 30},}
+airfoil3 = {Cl0 = 0.21, ZeroLiftAoA = -2.6}
 
 local function compute_CL_and_stats(airfoil, aoa_start_deg, aoa_end_deg, step_deg)
     step_deg = step_deg or 0.5
