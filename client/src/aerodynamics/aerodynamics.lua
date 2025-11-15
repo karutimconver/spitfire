@@ -7,29 +7,6 @@ local AIR_DENSITY = 0.4582725
 local AspectRatio =  5.61
 local e = 0.85
 
-local function calculateLiftCoefficient(AoA, airfoil)
-    --Lift curve slope
-    local AoAr = math.rad(AoA)
-    local AoA0 = math.rad(airfoil.ZeroLiftAoA)
-
-    -- 2D and finite-wing lift curve slopes
-    local a0 = 2 * math.pi
-    local a = 1 * a0 / (1 + (a0 / (math.pi * AspectRatio * e)))
-
-    -- Compute CL (linear region)
-    local Cl = a * (AoAr - AoA0)
-
-    if airfoil.flap then
-
-    end
-
-    return Cl
-end
-
-local function calculateCoeficients(AoA, airfoil)
-    local Cl = calculateLiftCoefficient(AoA, airfoil)
-end
-
 local function calculateForcesAndTorque(airfoil, AoA, velocity)
     local airflowVelocity = cpml.vec3.len(velocity)
     local wingLength = airfoil.length
