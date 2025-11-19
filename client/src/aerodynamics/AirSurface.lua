@@ -1,7 +1,8 @@
-local Cla0 = math.pi * 2 -- 2d lift curve slope
-local e = 0.85 -- Oswald efficiency factor
 local BaseZeroLiftAoAd = -2.0 -- angle in degrees!!
-local n = 1 -- correction factor
+local Cla0 = math.pi * 2 -- 2d lift curve slope
+local k = 0.374 -- experimently found constant for the delta ClMax
+local e = 0.85 -- Oswald efficiency factor
+local n = 1 -- delta Cl correction factor
 
 function airSurface(span, chord, flap, flapChordRatio)
     return {
