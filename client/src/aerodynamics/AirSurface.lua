@@ -2,9 +2,16 @@ local BaseZeroLiftAoAd = -2.0 -- angle in degrees!!
 local Cla0 = math.pi * 2 -- 2d lift curve slope
 local k = 0.374 -- experimently found constant for the delta ClMax
 local e = 0.85 -- Oswald efficiency factor
-local n = 1 -- delta Cl correction factor
 
-function airSurface(span, chord, flap, flapChordRatio)
+local function lerp(a, b, t)
+    if t == 1 then
+        return b
+    else
+        return a + (b - a) * t
+    end
+end
+
+    function airSurface(span, chord, flap, flapChordRatio)
     return {
         span = span,
         chord = chord,
@@ -27,7 +34,9 @@ function airSurface(span, chord, flap, flapChordRatio)
             local deltaCl = 0
             if self.flap then
                 local theta = math.acos(2 * self.flapChordRatio - 1)
-                local t = 1 - (theta - math.sin(theta)) / math.pi --flap efficiency factor 
+                local t = 1 - (theta - math.sin(theta)) / math.pi -- flap efficiency factor 
+                local n = lerp(0.8, 0.4, (math.deg(math.abs(self.flapDeflection)) - 10) / 50) -- correction factor
+
                 deltaCl = Cla * t * n * self.flapDeflection
             end
 
@@ -46,7 +55,7 @@ local function validateCoefficient(airfoil, min, max)
     end
 end
 
-local airfoil = airSurface(561, 100, true, 0.24) -- asa com o aspect ratio do spitfire
+local airfoil = airSurface(561, 100, true, 0.25) -- asa com o aspect ratio do spitfire
 airfoil:deflect(10)
 
 validateCoefficient(airfoil, -5, 5)
