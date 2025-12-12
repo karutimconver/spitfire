@@ -2,7 +2,8 @@ local BaseZeroLiftAoAd = -2.0 -- angle in degrees!!
 local BaseStallAnglePd = 14 -- positive angle (in degrees) at which the plain stalls
 local BaseStallAngleNd = -7 -- negative angle (in degrees) at which the plain stalls
 local Cla0 = math.pi * 2 -- 2d lift curve slope
-local k = 0.374 -- experimently found constant for the delta ClMax
+local Cd0 = 0.02 -- skin friction coefficient
+local k = 0.374 -- experimently found coefficient for the delta ClMax
 local e = 0.85 -- Oswald efficiency factor
 
 local function lerp(a, b, t)
@@ -21,6 +22,7 @@ function airSurface(config)
         flap = config.flap or false,
         flapChordRatio = config.flapChordRatio,
         flapDeflection = 0,
+        Cd0 = config.Cd0 or Cd0,
 
         deflect = function (self, angle)
             print(not self.flap)
@@ -33,7 +35,8 @@ function airSurface(config)
             local BaseStallAngleP = math.rad(BaseStallAnglePd)
             local BaseStallAngleN = math.rad(BaseStallAngleNd)
             local AoA = math.rad(AoAd)
-            -- Lift Coefficient
+
+            -- Calculating stall angles
             local Cla = Cla0 * self.AspectRatio / (self.AspectRatio + 2 * (self.AspectRatio + 4) / self.AspectRatio + 2) -- Lift curve slope corrected for finite wing area
             local deltaCl = 0
             if self.flap then
@@ -54,27 +57,77 @@ function airSurface(config)
             local StallAngleP = ZeroLiftAoA + ClmaxP / Cla
             local StallAngleN = ZeroLiftAoA + ClmaxN / Cla
 
+            -- Calculating coefficients
             local Cl = 0
-
-            print(math.deg(StallAngleN))
-            print(math.deg(StallAngleP))
+            local Cd = 0
+            local Cm = 0
 
             if StallAngleN < AoA and AoA < StallAngleP then
-                Cl = Cla * (AoA - ZeroLiftAoA)
+                Cl, Cd, Cm = self:calculateCoefficientsBeforeStall(ZeroLiftAoA, AoA, Cla)
+            else
+                Cl, Cd, Cm = self:calculateCoefficientsAtStall(ZeroLiftAoA, AoA, Cla, StallAngleP, StallAngleN)
             end
 
-            return Cl
+            return Cl, Cd, Cm
+        end,
+
+        calculateCoefficientsBeforeStall = function (self, ZeroLiftAoA, AoA, Cla)
+            local Cl = Cla * (AoA - ZeroLiftAoA)
+
+            local AoAi = Cl / (math.pi * self.AspectRatio)  -- induced angle of attack
+            local AoAe = AoA - ZeroLiftAoA - AoAi           -- effective angle of attack
+            local Ctangencial = self.Cd0 * math.cos(AoAe)
+            local Cnormal = (Cl + Ctangencial*math.sin(AoAe)) / math.cos(AoAe)
+
+            local Cd = Cnormal * math.sin(AoAe) + Ctangencial*math.cos(AoAe)
+            local Cm = -Cnormal*(0.25-0.175*(1 - 2*AoAe/math.pi))
+
+            return Cl, Cd, Cm
+        end,
+
+        calculateCoefficientsAtStall = function (self, ZeroLiftAoA, AoA, Cla, stallAngleP, stallAngleN)
+            local ClLowAoA
+
+            if AoA > stallAngleP then
+                ClLowAoA = Cla * (stallAngleP - ZeroLiftAoA)
+            else
+                ClLowAoA = Cla * (stallAngleN - ZeroLiftAoA)
+            end
+            local AoAi = ClLowAoA / (math.pi * self.AspectRatio)  -- induced angle of attack at low AoA
+
+            local lerpParam
+            if AoA > stallAngleP then
+                lerpParam = (math.pi/2 - math.max(-math.pi/2, math.min(math.pi/2, AoA))) / (math.pi/2 - stallAngleP)
+            else
+                lerpParam = (math.pi/2 - math.max(-math.pi/2, math.min(math.pi/2, AoA))) / (math.pi/2 - stallAngleN)
+            end
+            AoAi = lerp(0, AoAi, lerpParam)
+
+            local AoAe = AoA - ZeroLiftAoA - AoAi           -- effective angle of attack
+
+            local Cd90 = -0.0426*self.flapDeflection^2 + 0.21*self.flapDeflection + 1.98
+
+            local Cnormal = Cd90 * math.sin(AoAe) * (1/(0.56+0.44*math.abs(math.sin(AoAe)))-0.41*(1-math.exp(-17/self.AspectRatio)))
+
+            local Ctangencial = 0.5 * Cd0 * math.cos(AoAe)
+
+            local Cl = Cnormal * math.cos(AoAe) - Ctangencial * math.sin(AoAe)
+            local Cd = Cnormal * math.sin(AoAe) + Ctangencial * math.sin(AoAe)
+            local Cm = -Cnormal * (0.25 - 0.175*(1 - 2 * math.abs(AoAe) / math.pi))
+
+            return Cl, Cd, Cm
         end
     }
 end
 
 local function validateCoefficient(airfoil, min, max)
     for i = min, max, 0.5 do
-        print("AoA = ".. i .. "degrees -> Cl = " .. airfoil:calculateCoefficients(i))
+        local Cl, Cd, Cm = airfoil:calculateCoefficients(i)
+        print("AoA = ".. i .. "degrees -> Cl = " .. Cl .. " Cd = " .. Cd .. " Cm = " .. Cm)
     end
 end
 
 local airfoil = airSurface({span = 561, chord = 100, flap = true, flapChordRatio = 0.25}) -- asa com o aspect ratio do spitfire
-airfoil:deflect(10)
+airfoil:deflect(0)
 
-validateCoefficient(airfoil, -5, 5)
+validateCoefficient(airfoil, -10, 15)
