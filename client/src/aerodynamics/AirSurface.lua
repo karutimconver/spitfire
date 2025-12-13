@@ -1,6 +1,8 @@
 local BaseZeroLiftAoAd = -2.0 -- angle in degrees!!
 local BaseStallAnglePd = 14 -- positive angle (in degrees) at which the plain stalls
 local BaseStallAngleNd = -7 -- negative angle (in degrees) at which the plain stalls
+local BaseSmothingAnglePd = 5
+local BaseSmothingAngleNd = 5
 local Cla0 = math.pi * 2 -- 2d lift curve slope
 local Cd0 = 0.02 -- skin friction coefficient
 local k = 0.374 -- experimently found coefficient for the delta ClMax
@@ -11,6 +13,14 @@ local function lerp(a, b, t)
         return b
     else
         return a + (b - a) * t
+    end
+end
+
+local function clamp(v, a, b)
+    if a > b then
+        return math.min(b, math.max(a, v))
+    else
+        return math.min(a, math.max(b, v))
     end
 end
 
@@ -62,10 +72,20 @@ function airSurface(config)
             local Cd = 0
             local Cm = 0
 
-            if StallAngleN < AoA and AoA < StallAngleP then
-                Cl, Cd, Cm = self:calculateCoefficientsBeforeStall(ZeroLiftAoA, AoA, Cla)
+            local smothingAngleP = math.rad(BaseSmothingAnglePd)     -- constant but it could depend on flap deflection for more accurate results
+            local smothingAngleN = math.rad(BaseSmothingAngleNd)     -- constant but it could depend on flap deflection for more accurate results
+
+            Cl, Cd, Cm = self:calculateCoefficientsBeforeStall(ZeroLiftAoA, AoA, Cla)
+            Cls, Cds, Cms = self:calculateCoefficientsAtStall(ZeroLiftAoA, AoA, Cla, StallAngleP, StallAngleN)
+
+            if AoA > ZeroLiftAoA then
+                Cl = lerp(Cl, Cls, clamp((AoA-StallAngleP)/smothingAngleP, 0, 1))
+                Cd = lerp(Cd, Cds, clamp((AoA-StallAngleP)/smothingAngleP, 0, 1))
+                Cm = lerp(Cm, Cms, clamp((AoA-StallAngleP)/smothingAngleP, 0, 1))
             else
-                Cl, Cd, Cm = self:calculateCoefficientsAtStall(ZeroLiftAoA, AoA, Cla, StallAngleP, StallAngleN)
+                Cl = lerp(Cl, Cls, clamp(math.abs((AoA+StallAngleN)/smothingAngleN), 0, 1))
+                Cd = lerp(Cd, Cds, clamp(math.abs((AoA+StallAngleN)/smothingAngleN), 0, 1))
+                Cm = lerp(Cm, Cms, clamp(math.abs((AoA+StallAngleN)/smothingAngleN), 0, 1))
             end
 
             return Cl, Cd, Cm
