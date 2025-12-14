@@ -160,15 +160,14 @@ function airSurface(config)
     }
 end
 
-local function validateCoefficient(airfoil, min, max)
+--[[local function validateCoefficient(airfoil, min, max)
     for i = min, max, 0.5 do
         local Cl, Cd, Cm = airfoil:calculateCoefficients(i)
         print("AoA = ".. i .. "degrees -> Cl = " .. Cl .. " Cd = " .. Cd .. " Cm = " .. Cm)
     end
 end
 
-
 local airfoil = airSurface({span = 561, chord = 100, flap = true, flapChordRatio = 0.25}) -- asa com o aspect ratio do spitfire
 airfoil:deflect(0)
 
-validateCoefficient(airfoil, -10, 15)
+validateCoefficient(airfoil, -10, 15)]]
