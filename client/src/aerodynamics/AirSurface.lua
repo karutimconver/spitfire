@@ -1,3 +1,5 @@
+local cpml = require("lib/cpml")
+
 local BaseZeroLiftAoAd = -2.0 -- angle in degrees!!
 local BaseStallAnglePd = 14 -- positive angle (in degrees) at which the plain stalls
 local BaseStallAngleNd = -7 -- negative angle (in degrees) at which the plain stalls
@@ -6,7 +8,6 @@ local BaseSmothingAngleNd = 5
 local Cla0 = math.pi * 2 -- 2d lift curve slope
 local Cd0 = 0.02 -- skin friction coefficient
 local k = 0.374 -- experimently found coefficient for the delta ClMax
-local e = 0.85 -- Oswald efficiency factor
 
 local function lerp(a, b, t)
     if t == 1 then
@@ -26,6 +27,9 @@ end
 
 function airSurface(config)
     return {
+        x = config.x,
+        y = config.y,
+        id = config.id,
         span = config.span,
         chord = config.chord,
         AspectRatio = config.span / config.chord,
@@ -35,9 +39,25 @@ function airSurface(config)
         Cd0 = config.Cd0 or Cd0,
 
         deflect = function (self, angle)
-            print(not self.flap)
-            assert(self.flap, "ERROR! This airSurface (" .. ") does not have a flap but is trying to deflect!")
+            assert(self.flap, "ERROR! This airSurface (" .. 0 .. ") does not have a flap but is trying to deflect!")
             self.flapDeflection = math.rad(angle)
+        end,
+
+        calculateForcesAndTorque = function(self, velocity, right, AoA, airDensity)
+            -- velocity is the aircraft velocity
+            local airflowVelocity = cpml.vec3.len(velocity)
+            local wingLength = self.chord
+            local wingArea = self.span * self.chord
+            local Cl, Cd, Cm = self:calculateCoefficients(AoA)
+
+            local liftModule = Cl * airDensity * airflowVelocity^2 / 2 * wingArea
+            local dragModule = Cd * airDensity * airflowVelocity^2 / 2 * wingArea
+            local torque = Cm * airDensity * airflowVelocity^2 / 2 * wingArea * wingLength
+
+            local drag = cpml.vec3.scale(cpml.vec3.normalize(velocity), -dragModule)
+            local lift = cpml.vec3.scale(cpml.vec3.normalize(cpml.vec3.cross(drag, right)), liftModule)
+
+            return cpml.vec3.add(lift, drag), torque
         end,
 
         calculateCoefficients = function(self, AoAd)
@@ -146,6 +166,7 @@ local function validateCoefficient(airfoil, min, max)
         print("AoA = ".. i .. "degrees -> Cl = " .. Cl .. " Cd = " .. Cd .. " Cm = " .. Cm)
     end
 end
+
 
 local airfoil = airSurface({span = 561, chord = 100, flap = true, flapChordRatio = 0.25}) -- asa com o aspect ratio do spitfire
 airfoil:deflect(0)
