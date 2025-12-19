@@ -7,17 +7,25 @@ local function object(_position, _rotation, _scale)
     if _position.x then position = _position else position = cpml.vec3.new(position) end
 
     local rotation
-    if _rotation.direction then
-        rotation = cpml.mat4.from_perspective(_rotation.direction, _rotation.up)
+    if _rotation then
+        if _rotation.direction then
+            rotation = cpml.mat4.from_perspective(_rotation.direction, _rotation.up)
+        else
+            rotation = _rotation    
+        end
     else
-        rotation = _rotation
+        rotation = cpml.mat4.identity()
     end
 
     local scale
-    if _scale.x then
-        scale = cpml.mat4.scale(cpml.mat4.new(), cpml.mat4.identity(), cpml.vec3.new(_scale[1], _scale[2], _scale[3]))
+    if scale then
+        if _scale.x then
+            scale = cpml.mat4.scale(cpml.mat4.new(), cpml.mat4.identity(), cpml.vec3.new(_scale[1], _scale[2], _scale[3]))
+        else
+            scale = cpml.mat4.scale(cpml.mat4.new(), cpml.mat4.identity(), cpml.vec3.new(_scale[1], _scale[2], _scale[3]))
+        end
     else
-        scale = cpml.mat4.scale(cpml.mat4.new(), cpml.mat4.identity(), cpml.vec3.new(_scale[1], _scale[2], _scale[3]))
+        scale = cpml.mat4.identity()
     end
 
     return {
@@ -26,6 +34,7 @@ local function object(_position, _rotation, _scale)
         scale = scale,
 
         draw = function(self)
+            local rotated = cpml.mat4.mul()
             local modelMatrix = 
 
             shader:send("objectMatrix", "column", modelMatrix)
