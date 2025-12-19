@@ -34,7 +34,7 @@ local function object(_position, _rotation, _scale)
         scale = scale,
 
         draw = function(self)
-            local rotated = cpml.mat4.mul()
+            local rotated = cpml.mat4.mul(cpml.mat4.new(), self.scale, self.rotation)
             local modelMatrix = 
 
             shader:send("objectMatrix", "column", modelMatrix)
