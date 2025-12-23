@@ -56,7 +56,7 @@ local function Player(pos)
             local dp = cpml.vec3.dot(vertical_vector, self.forward)  -- produto escalar entre vetor no semieixo Oy e vetor forward para saber o quão longe está forward de Oy
             local diff = 1 - math.abs(dp)                            -- um se for perpendicular
             p_up = cpml.vec3.mul(p_up, cpml.vec3.new(diff, diff, diff))
-            print(p_up)
+            --print(p_up)
             self.position = cpml.vec3.add(self.position, cpml.vec3.mul(self.forward, cpml.vec3.new(self.speed * dt, self.speed * dt, self.speed * dt)))
             self.position = cpml.vec3.add(self.position, cpml.vec3.mul(p_up, cpml.vec3.new(dt * 20, dt * 20, dt * 20)))
 

@@ -1,5 +1,6 @@
 require "src/globals"
 require "src/3drendering/mesh"
+local object = require "src/3drendering/object3d"
 
 local shader = require "src/3drendering/shader"
 local cpml = require "lib/cpml"
@@ -13,13 +14,13 @@ local AspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT
 
 function _G.init3d()
     love.graphics.setDepthMode("lequal", true)
-    Timer = 0
     _G.mesh = Mesh("res/meshes/mountains.obj", "res/images/spitfire textures/noise.png")
     _G.Camera = cpml.vec3.new(0, 0, 0)
     _G.right = cpml.vec3.new(1, 0, 0)
     _G.up = cpml.vec3.new(0, 1, 0)
     _G.forward = cpml.vec3.new(0, 0, 1)
 
+    local mountain = object(mesh, {position = {0, 0, 0}, rotation = {0, 0, 0}, scale = {1, 1, 1}})
     shader:send("usingCanvas", true)
     shader:send("projectionMatrix", "column", cpml.mat4.from_perspective(FOV, AspectRatio, Near, Far))
 end
@@ -93,8 +94,14 @@ end
 function _G.draw3d()
     love.graphics.setShader(shader)
     shader:send("viewMatrix", "column", viewMatrix)
+
     shader:send("objectMatrix", "column", modelMatrix)
 
-    love.graphics.draw(mesh.m)
+    --love.graphics.draw(mesh.m)
+
+    for _, object in pairs(Objects3dSet) do
+        object:draw()
+    end
+
     love.graphics.setShader()
 end
