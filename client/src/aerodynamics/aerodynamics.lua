@@ -1,9 +1,10 @@
 local cpml = require "lib/cpml"
 
 local G = 9.80665
-local MASS = 1000
+local MASS = 2500
 local WEIGHT = G*MASS
 local AIR_DENSITY = 0.4582725
+local THRUST = 770000
 
 function aerodynamics(airfoils, forward, up, right, velocity)
     local totalForce = cpml.vec3.new(0, 0, 0)
@@ -16,10 +17,17 @@ function aerodynamics(airfoils, forward, up, right, velocity)
         aForce, aTorque = airfoil:calculateForcesAndTorque(velocity, right, AoA, AIR_DENSITY)
         totalForce = cpml.vec3.add(totalForce, aForce)
         pitchingMoment = pitchingMoment + aTorque
-        totalTorque = cpml.vec3.add(cpml.vec3.cross(airfoil.position, totalForce), totalTorque)
+        totalTorque = cpml.vec3.add(cpml.vec3.cross(airfoil:position(forward, up), totalForce), totalTorque) -- NEED TO TAKE CALCULATE AIRFOIL:POSITION!!!!!!!!!!
     end
 
     totalTorque = cpml.vec3.add(totalTorque, cpml.vec3.scale(cpml.vec3.normalize(right), -pitchingMoment))
 
-    local weight = cpml.vec3.new(0, -1, 0)
+    -- Calculate acceleration
+
+    local direction = cpml.vec3.normalize(totalForce)
+    local linearAcceleration = cpml.vec3.scale(direction, cpml.vec3.len(totalForce) / MASS)
+
+
+
+    return linearAcceleration
 end
