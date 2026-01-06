@@ -5,6 +5,7 @@ local MASS = 2500
 local WEIGHT = G*MASS
 local AIR_DENSITY = 0.4582725
 local THRUST = 770000
+local MOMENT_OF_INERTIA = 1625 -- aproximation. Might have to be calculated
 
 function aerodynamics(airfoils, forward, up, right, velocity)
     local totalForce = cpml.vec3.new(0, 0, 0)
@@ -24,10 +25,16 @@ function aerodynamics(airfoils, forward, up, right, velocity)
 
     -- Calculate acceleration
 
-    local direction = cpml.vec3.normalize(totalForce)
-    local linearAcceleration = cpml.vec3.scale(direction, cpml.vec3.len(totalForce) / MASS)
 
-
+    local angularAccelaration = cpml.vec.scale()
 
     return linearAcceleration
+end
+
+function applyForce(force)
+    local direction = cpml.vec3.normalize(force)
+    local linearAcceleration = cpml.vec3.scale(direction, cpml.vec3.len(force) / MASS)
+end
+
+function applyTorque()
 end
