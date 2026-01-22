@@ -18,6 +18,8 @@ end
 local function applyTorque(torque)
     local direction = cpml.vec3.normalize(torque)
     local angularAccelaration = cpml.vec3.scale(direction, cpml.vec3.len(torque) / MOMENT_OF_INERTIA)
+
+    return angularAccelaration
 end
 
 function aerodynamics(airfoils, forward, up, right, velocity)
@@ -25,7 +27,10 @@ function aerodynamics(airfoils, forward, up, right, velocity)
     local pitchingMoment = 0
     local totalTorque = cpml.vec3.new(0, 0, 0)
 
-    local AoA = math.acos(cpml.vec3.dot(forward, velocity) / (cpml.vec3.len(forward) * cpml.vec3.len(velocity)))
+    local perspective = cpml.mat4.transpose(cpml.mat4.new(), cpml.mat4.from_direction(forward, up))
+    local relativeVelocity = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, velocity)
+
+    local AoA = math.atan(relativeVelocity.y, -relativeVelocity.z)
 
     local aForce, aTorque
     for _, airfoil in pairs(airfoils) do
