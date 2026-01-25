@@ -36,9 +36,9 @@ local function object(_mesh, transform)
     end
 
     local scale
-    if scale then
+    if _scale then
         if _scale.x then
-            scale = cpml.mat4.scale(cpml.mat4.new(), cpml.mat4.identity(), cpml.vec3.new(_scale[1], _scale[2], _scale[3]))
+            scale = cpml.mat4.scale(cpml.mat4.new(), cpml.mat4.identity(), cpml.vec3.new(_scale.x, _scale.y, _scale.xz))
         else
             scale = cpml.mat4.scale(cpml.mat4.new(), cpml.mat4.identity(), cpml.vec3.new(_scale[1], _scale[2], _scale[3]))
         end

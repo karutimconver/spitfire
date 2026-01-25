@@ -86,11 +86,6 @@ local function Aircraft()
             local totalForce = cpml.vec3.new(0, 0, 0)
             local pitchingMoment = 0
             local totalTorque = cpml.vec3.new(0, 0, 0)
-            print(self)
-            print(forward)
-            print(right)
-            print(up)
-            print(velocity)
 
             local perspective = cpml.mat4.transpose(cpml.mat4.new(), cpml.mat4.from_direction(forward, up))
             local relativeVelocity = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, velocity)

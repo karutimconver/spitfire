@@ -4,11 +4,11 @@ local Aircraft = require "src/aerodynamics/aircraft"
 
 local function Player(pos)
     local object = {
-        position = pos or cpml.vec3.new(0, 10, 0),
+        position = pos or cpml.vec3.new(0, 100, 0),
         forward = cpml.vec3.new(0, 0, 1),
         right = cpml.vec3.new(1, 0, 0),
         up = cpml.vec3.new(0, 1, 0),
-        linearVelocity = cpml.vec3.new(0, 0, 15),
+        linearVelocity = cpml.vec3.new(0, 0, 400),
         angularVelocity = cpml.vec3.new(0, 0, 0),
         aircraft = Aircraft(),
 
