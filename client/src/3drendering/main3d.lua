@@ -20,7 +20,7 @@ function _G.init3d()
     _G.up = cpml.vec3.new(0, 1, 0)
     _G.forward = cpml.vec3.new(0, 0, 1)
 
-    local mountain = object(mesh, {position = {0, 0, 0}, rotation = {0, 0, 0}, scale = {1, 1, 1}})
+    local mountain = object(mesh, {position = {0, 0, 0}, rotation = {0, 0, 0}, scale = {1000, 1, 1000}})
     shader:send("usingCanvas", true)
     shader:send("projectionMatrix", "column", cpml.mat4.from_perspective(FOV, AspectRatio, Near, Far))
 end

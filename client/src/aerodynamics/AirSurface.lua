@@ -25,7 +25,7 @@ local function clamp(v, a, b)
     end
 end
 
-function airSurface(config)
+local function airSurface(config)
     return {
         x = config.x or config.position.x,
         y = config.y or config.position.y,
@@ -166,6 +166,8 @@ function airSurface(config)
         end
     }
 end
+
+return airSurface
 
 --[[local function validateCoefficient(airfoil, min, max)
     for i = min, max, 0.5 do

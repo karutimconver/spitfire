@@ -1,13 +1,16 @@
 local cpml = require "lib/cpml"
 local love = require "love"
+local Aircraft = require "src/aerodynamics/aircraft"
 
 local function Player(pos)
     local object = {
-        position = pos or cpml.vec3.new(0, 0, 0),
+        position = pos or cpml.vec3.new(0, 10, 0),
         forward = cpml.vec3.new(0, 0, 1),
         right = cpml.vec3.new(1, 0, 0),
         up = cpml.vec3.new(0, 1, 0),
-        velocity = cpml.vec3.new(0, 0, 15),
+        linearVelocity = cpml.vec3.new(0, 0, 15),
+        angularVelocity = cpml.vec3.new(0, 0, 0),
+        aircraft = Aircraft(),
 
         speed = 15,
 
@@ -53,10 +56,17 @@ local function Player(pos)
             local diff = 1 - math.abs(dp)                            -- um se for perpendicular
             p_up = cpml.vec3.mul(p_up, cpml.vec3.new(diff, diff, diff))
             --print(p_up)
-            self.position = cpml.vec3.add(self.position, cpml.vec3.mul(self.forward, cpml.vec3.new(self.speed * dt, self.speed * dt, self.speed * dt)))
-            self.position = cpml.vec3.add(self.position, cpml.vec3.mul(p_up, cpml.vec3.new(dt * 20, dt * 20, dt * 20)))
+            --self.position = cpml.vec3.add(self.position, cpml.vec3.mul(self.forward, cpml.vec3.new(self.speed * dt, self.speed * dt, self.speed * dt)))
+            --self.position = cpml.vec3.add(self.position, cpml.vec3.mul(p_up, cpml.vec3.new(dt * 20, dt * 20, dt * 20)))
 
             --[[   Novo Método    ]]
+
+            local accelerations = self.aircraft:aerodynamics(self.forward, self.up, self.right, self.linearVelocity)
+
+            self.linearVelocity = self.linearVelocity + accelerations.linear * dt
+            self.angularVelocity = self.angularVelocity + accelerations.angular * dt
+
+            self.position = cpml.vec3.add(self.position, cpml.vec3.scale(self.linearVelocity, dt))
         end,
 
         update = function(self, dt)
