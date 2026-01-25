@@ -67,6 +67,11 @@ local function Player(pos)
             self.angularVelocity = self.angularVelocity + accelerations.angular * dt
 
             self.position = cpml.vec3.add(self.position, cpml.vec3.scale(self.linearVelocity, dt))
+
+            if self.position.y < 0 then
+                self.position.y = 0
+                self.linearVelocity.y = 0
+            end
         end,
 
         update = function(self, dt)

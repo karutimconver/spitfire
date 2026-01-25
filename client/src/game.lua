@@ -112,7 +112,11 @@ local game = {
             love.window.setFullscreen(FULLSCREEN)
         end
         if key == "p" then
-            print(Camera)
+            if self:checkState("pause") then
+                self:setState("running")
+            else
+                self:setState("pause")
+            end
         end
     end
 }

@@ -5,8 +5,10 @@ local G = 9.80665
 local MASS = 2500
 local WEIGHT = cpml.vec3.new(0, -G*MASS, 0)
 local AIR_DENSITY = 0.4582725
-local THRUST = 770000
 local MOMENT_OF_INERTIA = 1625 -- aproximation.  Might have to be calculated
+local POWER = 870000
+local n = 0.91               -- propeller efficiency
+
 
 local function Aircraft()
     return {
@@ -69,17 +71,11 @@ local function Aircraft()
 
 
         applyForce = function(force)
-            local direction = cpml.vec3.normalize(force)
-            local linearAcceleration = cpml.vec3.scale(direction, cpml.vec3.len(force) / MASS)
-
-            return linearAcceleration
+            return cpml.vec3.scale(force, 1 / MASS)
         end,
 
         applyTorque = function(torque)
-            local direction = cpml.vec3.normalize(torque)
-            local angularAccelaration = cpml.vec3.scale(direction, cpml.vec3.len(torque) / MOMENT_OF_INERTIA)
-
-            return angularAccelaration
+            return cpml.vec3.scale(torque, 1 / MOMENT_OF_INERTIA)
         end,
 
         aerodynamics = function(self, forward, up, right, velocity)
@@ -88,7 +84,7 @@ local function Aircraft()
             local totalTorque = cpml.vec3.new(0, 0, 0)
 
             local perspective = cpml.mat4.transpose(cpml.mat4.new(), cpml.mat4.from_direction(forward, up))
-            local relativeVelocity = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, velocity)
+            local relativeVelocity = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, cpml.vec3.scale(velocity, -1))
 
             local AoA = math.atan(relativeVelocity.y, -relativeVelocity.z)
 
@@ -101,11 +97,16 @@ local function Aircraft()
             end
 
             totalForce = cpml.vec3.add(totalForce, WEIGHT)
-            totalForce = cpml.vec3.add(totalForce, cpml.vec3.scale(forward, THRUST))
+            local speed = cpml.vec3.len(velocity)
+            local thrust = n * POWER / speed
+            totalForce = cpml.vec3.add(totalForce, cpml.vec3.scale(forward, thrust))
             totalTorque = cpml.vec3.add(totalTorque, cpml.vec3.scale(cpml.vec3.normalize(right), -pitchingMoment))
 
             -- Calculate acceleration
 
+            print("AoA: ", AoA)
+            print("Relative velocity: ", relativeVelocity)
+            print("totalForce: ", totalForce)
             local angularAccelaration = self.applyTorque(totalTorque)
             local linearAcceleration = self.applyForce(totalForce)
 
