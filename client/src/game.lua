@@ -111,28 +111,9 @@ local game = {
             FULLSCREEN = not FULLSCREEN
             love.window.setFullscreen(FULLSCREEN)
         end
-        --[[[if key == "p" then
-            if self:checkState("pause") then
-                self:setState("running")
-            else
-                self:setState("pause")
-            end
+        if key == "p" then
+            print(Camera)
         end
-        if key == "i" then
-            print(viewMatrix[1], viewMatrix[2], viewMatrix[3], viewMatrix[4])
-            print(viewMatrix[5], viewMatrix[6], viewMatrix[7], viewMatrix[8])
-            print(viewMatrix[9], viewMatrix[10], viewMatrix[11], viewMatrix[12])
-            print(viewMatrix[13], viewMatrix[14], viewMatrix[15], viewMatrix[16])
-
-            local view = cpml.mat4.look_at(cpml.mat4.new(), Camera,
-            cpml.vec3.new(Camera.x + forward.x, Camera.y + forward.y, Camera.z + forward.z),
-            up)
-
-            print(view[1], view[2], view[3], view[4])
-            print(view[5], view[6], view[7], view[8])
-            print(view[9], view[10], view[11], view[12])
-            print(view[13], view[14], view[15], view[16])
-        end]]
     end
 }
 

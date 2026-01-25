@@ -1,4 +1,4 @@
-local cpml = require("lib/cpml")
+local cpml = require "lib/cpml"
 local love = require "love"
 
 local function Player(pos)
@@ -8,10 +8,6 @@ local function Player(pos)
         right = cpml.vec3.new(1, 0, 0),
         up = cpml.vec3.new(0, 1, 0),
         velocity = cpml.vec3.new(0, 0, 15),
-        airfoils = {
-            {area = 40,
-             length = 20}
-        },
 
         speed = 15,
 

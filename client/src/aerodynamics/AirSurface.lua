@@ -29,7 +29,7 @@ function airSurface(config)
     return {
         x = config.x or config.position.x,
         y = config.y or config.position.y,
-        id = config.id,
+        id = config.id or 0,
         span = config.span,
         chord = config.chord,
         AspectRatio = config.span / config.chord,
@@ -41,12 +41,12 @@ function airSurface(config)
         position = function (self, forward, up)
             local rotation = cpml.mat4.from_direction(forward, up)
 
-            local position = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), rotation, cpml.vec3.new(self.x, self.y, 0))
+            local position = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), rotation, cpml.vec3.new(self.x, 0, self.y))
             return position
         end,
 
         deflect = function (self, angle)
-            assert(self.flap, "ERROR! This airSurface (" .. 0 .. ") does not have a flap but is trying to deflect!")
+            assert(self.flap, "ERROR! This airSurface (" .. self.id .. ") does not have a flap but is trying to deflect!")
             self.flapDeflection = math.rad(angle)
         end,
 
