@@ -18,7 +18,7 @@ local function lerp(a, b, t)
 end
 
 local function clamp(v, a, b)
-    if a > b then
+    if a < b then
         return math.min(b, math.max(a, v))
     else
         return math.min(a, math.max(b, v))
@@ -32,7 +32,7 @@ local function airSurface(config)
         id = config.id or 0,
         span = config.span,
         chord = config.chord,
-        AspectRatio = config.span / config.chord,
+        AspectRatio = config.AR,
         flap = config.flap or false,
         flapChordRatio = config.flapChordRatio,
         flapDeflection = 0,
@@ -63,7 +63,7 @@ local function airSurface(config)
 
             local drag = cpml.vec3.scale(cpml.vec3.normalize(velocity), -dragModule)
             local lift = cpml.vec3.scale(cpml.vec3.normalize(cpml.vec3.cross(right, drag)), liftModule)
-            print("lift: ", lift )
+            --print("lift: ", lift )
 
             return cpml.vec3.add(lift, drag), torque
         end,
@@ -169,15 +169,20 @@ local function airSurface(config)
 end
 
 return airSurface
-
---[[local function validateCoefficient(airfoil, min, max)
+--[[
+local function validateCoefficient(airfoil, min, max)
     for i = min, max, 0.5 do
         local Cl, Cd, Cm = airfoil:calculateCoefficients(i)
         print("AoA = ".. i .. "degrees -> Cl = " .. Cl .. " Cd = " .. Cd .. " Cm = " .. Cm)
     end
 end
 
-local airfoil = airSurface({span = 561, chord = 100, flap = true, flapChordRatio = 0.25}) -- asa com o aspect ratio do spitfire
-airfoil:deflect(0)
+local airfoil = airSurface({x = -1.6,
+                y = 0.6,
+                span = 3.0,
+                chord = 2.2,
+                AR = 5.61,
+                id = "leftWing",
+                flap = false}) -- asa com o aspect ratio do spitfire
 
-validateCoefficient(airfoil, -10, 15)]]
+validateCoefficient(airfoil, -30, 35)]]
