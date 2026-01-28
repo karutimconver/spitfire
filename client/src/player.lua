@@ -8,7 +8,7 @@ local function Player(pos)
         forward = cpml.vec3.new(0, 0, 1),
         right = cpml.vec3.new(1, 0, 0),
         up = cpml.vec3.new(0, 1, 0),
-        linearVelocity = cpml.vec3.new(0, -10, 100),
+        linearVelocity = cpml.vec3.new(0, 0, 100),
         angularVelocity = cpml.vec3.new(0, 0, 0),
         aircraft = Aircraft(),
 
