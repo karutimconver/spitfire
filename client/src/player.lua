@@ -15,25 +15,48 @@ local function Player(pos)
         speed = 15,
 
         controls = function (self, dt)
+            self.aircraft.airfoils.leftAileron:deflect(0)
+            self.aircraft.airfoils.rightAileron:deflect(0)
+            self.aircraft.airfoils.leftElevator:deflect(0)
+            self.aircraft.airfoils.rightElevator:deflect(0)
+
             if love.keyboard.isDown("left") then
-                self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.up))
-                self.right = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.right))
+                --self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.up))
+                --self.right = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1.5*dt, self.forward), self.right))
+
+                self.aircraft.airfoils.leftAileron:deflect(10)
+                self.aircraft.airfoils.rightAileron:deflect(-10)
             end
 
             if love.keyboard.isDown("right") then
-                self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1.5*dt, self.forward), self.up))
-                self.right = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1.5*dt, self.forward), self.right))
+                --self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1.5*dt, self.forward), self.up))
+                --self.right = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1.5*dt, self.forward), self.right))
+
+                self.aircraft.airfoils.leftAileron:deflect(-10)
+                self.aircraft.airfoils.rightAileron:deflect(10)
             end
 
             if love.keyboard.isDown("up") then
-                self.forward = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1*dt, self.right), self.forward))
-                self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1*dt, self.right), self.up))
+                --self.forward = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1*dt, self.right), self.forward))
+                --self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(1*dt, self.right), self.up))
+
+                self.aircraft.airfoils.leftElevator:deflect(25)
+                self.aircraft.airfoils.rightElevator:deflect(25)
             end
 
             if love.keyboard.isDown("down") then
-                self.forward = cpml.vec3.normalize(cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.forward)))
-                self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.up))
+                --self.forward = cpml.vec3.normalize(cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.forward)))
+                --self.up = cpml.vec3.normalize(cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), cpml.mat4.from_angle_axis(-1*dt, self.right), self.up))
+
+                self.aircraft.airfoils.leftElevator:deflect(-25)
+                self.aircraft.airfoils.rightElevator:deflect(-25)
             end
+        end,
+
+        rotate = function (self, angularVelocity, dt)
+            self.forward = cpml.mat4.mul_vec3_perspective(self.forward, cpml.mat4.from_angle_axis(cpml.vec3.len(angularVelocity * dt), angularVelocity), self.forward)
+            self.right = cpml.mat4.mul_vec3_perspective(self.right, cpml.mat4.from_angle_axis(cpml.vec3.len(angularVelocity * dt), angularVelocity), self.right)
+            self.up = cpml.mat4.mul_vec3_perspective(self.up, cpml.mat4.from_angle_axis(cpml.vec3.len(angularVelocity * dt), angularVelocity), self.up)
         end,
 
         move = function(self, dt)
@@ -61,12 +84,14 @@ local function Player(pos)
 
             --[[   Novo Método    ]]
 
-            local accelerations = self.aircraft:aerodynamics(self.forward, self.up, self.right, self.linearVelocity)
+            local accelerations = self.aircraft:aerodynamics(self.forward, self.up, self.right, self.linearVelocity, self.angularVelocity)
 
             self.linearVelocity = self.linearVelocity + accelerations.linear * dt
             self.angularVelocity = self.angularVelocity + accelerations.angular * dt
 
-            self.position = cpml.vec3.add(self.position, cpml.vec3.scale(self.linearVelocity, dt))
+            self.position = self.position + self.linearVelocity * dt
+
+            self:rotate(self.angularVelocity, dt)
 
             if self.position.y < 0 then
                 self.position.y = 0
@@ -78,7 +103,7 @@ local function Player(pos)
             self:move(dt)
         end
     }
-
+    print(object.aircraft.leftAileron)
     return object
 end
 

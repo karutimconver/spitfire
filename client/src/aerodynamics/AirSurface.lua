@@ -127,7 +127,7 @@ local function airSurface(config)
             local Ctangencial = self.Cd0 * math.cos(AoAe)
             local Cnormal = (Cl + Ctangencial*math.sin(AoAe)) / math.cos(AoAe)
 
-            local Cd = Cnormal * math.sin(AoAe) + Ctangencial*math.cos(AoAe)
+            local Cd = Cnormal * math.sin(AoAe) + Ctangencial * math.cos(AoAe)
             local Cm = -Cnormal*(0.25-0.175*(1 - 2*AoAe/math.pi))
 
             return Cl, Cd, Cm
