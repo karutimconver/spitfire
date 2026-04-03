@@ -103,7 +103,7 @@ local function Player(pos)
             self:move(dt)
         end
     }
-    print(object.aircraft.leftAileron)
+    print(object.aircraft.airfoils.leftAileron)
     return object
 end
 
