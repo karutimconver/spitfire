@@ -37,6 +37,7 @@ local function airSurface(config)
         flapChordRatio = config.flapChordRatio,
         flapDeflection = 0,
         Cd0 = config.Cd0 or Cd0,
+        vertical = config.vertical or false,
 
         position = function (self, forward, up)
             local rotation = cpml.mat4.from_direction(forward, up)

@@ -75,6 +75,16 @@ local function Aircraft()
                 id = "leftElevator",
                 flap = true,
                 flapChordRatio = 0.25,
+            }),
+
+            verticalStabilizer = AirSurface({
+                x = 0.0,
+                y = -5.0,
+                span = 2.0,
+                chord = 1.5,
+                AR = 2.5,
+                id = "verticalStabilizer",
+                flap = false,
             })
         },
 
@@ -129,6 +139,9 @@ local function Aircraft()
                 end
 
                 aForce, aTorque = airfoil:calculateForcesAndTorque(localAirVelocity, right, AoA, AIR_DENSITY)
+                if airfoil.vertical then
+                    aForce, aTorque = airfoil:calculateForcesAndTorque(localAirVelocity, up, AoA, AIR_DENSITY)
+                end
                 totalForce = cpml.vec3.add(totalForce, aForce)
                 pitchingMoment = pitchingMoment + aTorque
                 totalTorque = cpml.vec3.add(cpml.vec3.cross(airfoil:position(forward, up), aForce), totalTorque)
