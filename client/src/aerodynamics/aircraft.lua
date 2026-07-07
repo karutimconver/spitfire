@@ -5,7 +5,7 @@ local G = 9.80665
 local MASS = 2500
 local WEIGHT = cpml.vec3.new(0, -G*MASS, 0)
 local AIR_DENSITY = 0.4582725
-local MOMENT_OF_INERTIA = cpml.vec3.new(22370, -- Pitch
+local MOMENT_OF_INERTIA = cpml.vec3.new(40000, -- Pitch
                                         34570, -- Yaw
                                         14235) -- Roll
 local ANGULAR_DAMPING = MOMENT_OF_INERTIA * 0.2
@@ -85,7 +85,6 @@ local function Aircraft()
         applyTorque = function(torque, perspective)
             local a = cpml.vec3.new()
             local t = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, torque)
-            print(t)
             a.x = t.x / MOMENT_OF_INERTIA.x
             a.y = t.y / MOMENT_OF_INERTIA.y
             a.z = t.z / MOMENT_OF_INERTIA.z
@@ -100,30 +99,36 @@ local function Aircraft()
             local pitchingMoment = 0
 
             local perspective = cpml.mat4.transpose(cpml.mat4.new(), cpml.mat4.from_direction(forward, up))
-            local relativeVelocity = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, cpml.vec3.scale(velocity, -1))
+            --local relativeVelocity = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, cpml.vec3.scale(velocity, -1))
             local relativeAngularVelocity = cpml.mat4.mul_vec3_perspective(cpml.vec3.new(), perspective, angularVelocity)
 
             --local AoA = math.atan(relativeVelocity.y / relativeVelocity.z)]]
 
-            local v = cpml.vec3.normalize(cpml.vec3.new(velocity.x, velocity.y, velocity.z))
+            --local v = cpml.vec3.normalize(cpml.vec3.new(velocity.x, velocity.y, velocity.z))
+--
+            --local v_fwd = cpml.vec3.dot(v, forward)
+            --local v_up  = cpml.vec3.dot(v, up)
 
-            local v_fwd = cpml.vec3.dot(v, forward)
-            local v_up  = cpml.vec3.dot(v, up)
-
-            local AoA = math.deg(-math.atan2(v_up, v_fwd))
+            local AoA --= math.deg(-math.atan2(v_up, v_fwd))
 
             local aForce, aTorque
             for _, airfoil in pairs(self.airfoils) do
+                local r = airfoil:position(forward, up)
+
+                local localAirVelocity = cpml.vec3.sub(cpml.vec3.scale(velocity, -1), cpml.vec3.cross(angularVelocity, r))
+                local localAir = cpml.vec3.normalize(localAirVelocity)
+
+                local v_fwd = -cpml.vec3.dot(localAir, forward)
+                local v_up  = -cpml.vec3.dot(localAir, up)
+
                 AoA = math.deg(-math.atan2(v_up, v_fwd))
-                local deltaAoA = airfoil.x * relativeAngularVelocity.z / cpml.vec3.len(velocity)
-                AoA = AoA + math.deg(deltaAoA)
                 --print(AoA)
 
                 if airfoil.id == "leftElevator" or airfoil.id == "rightElevator" then
                     AoA = AoA - 2
                 end
 
-                aForce, aTorque = airfoil:calculateForcesAndTorque(velocity, right, AoA, AIR_DENSITY)
+                aForce, aTorque = airfoil:calculateForcesAndTorque(localAirVelocity, right, AoA, AIR_DENSITY)
                 totalForce = cpml.vec3.add(totalForce, aForce)
                 pitchingMoment = pitchingMoment + aTorque
                 totalTorque = cpml.vec3.add(cpml.vec3.cross(airfoil:position(forward, up), aForce), totalTorque)
@@ -135,14 +140,15 @@ local function Aircraft()
             totalForce = cpml.vec3.add(totalForce, cpml.vec3.scale(forward, thrust))
 
             totalTorque = cpml.vec3.add(totalTorque, cpml.vec3.scale(cpml.vec3.normalize(right), -pitchingMoment))
-            local dampingTorque = cpml.vec3.new(angularVelocity.x, angularVelocity.y, angularVelocity.z) * -ANGULAR_DAMPING
-            totalTorque = totalTorque
+            local dampingTorque = cpml.vec3.new(relativeAngularVelocity.x, relativeAngularVelocity.y, relativeAngularVelocity.z) * -ANGULAR_DAMPING
+            totalTorque = totalTorque + cpml.mat4.mul_vec3_perspective(dampingTorque, cpml.mat4.transpose(cpml.mat4.new(), perspective), dampingTorque)
 
             -- Calculate acceleration
 
             print("AoA: ", AoA)
             print("Angular Velocity: ", angularVelocity)
             print("totalTorque: ", totalTorque)
+
             --print("dampingTorque: ")
             local angularAccelaration = self.applyTorque(totalTorque, perspective)
             local linearAcceleration = self.applyForce(totalForce)

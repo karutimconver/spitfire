@@ -61,7 +61,7 @@ local function airSurface(config)
             local dragModule = Cd * airDensity * airflowVelocity^2 / 2 * wingArea
             local torque = Cm * airDensity * airflowVelocity^2 / 2 * wingArea * wingLength
 
-            local drag = cpml.vec3.scale(cpml.vec3.normalize(velocity), -dragModule)
+            local drag = cpml.vec3.scale(cpml.vec3.normalize(velocity), dragModule)
             local lift = cpml.vec3.scale(cpml.vec3.normalize(cpml.vec3.cross(right, drag)), liftModule)
             --print("lift: ", lift )
 

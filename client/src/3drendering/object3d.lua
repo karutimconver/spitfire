@@ -49,8 +49,6 @@ local function object(_mesh, transform)
     local mesh = _mesh
     if type(mesh) == "string" then
         mesh = Mesh(mesh)
-    else
-        mesh = _mesh
     end
 
     _object = {

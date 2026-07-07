@@ -14,26 +14,30 @@ local states = {"running", "menu", "pause", "lobby"}
 local game = {
     state = "menu",
 
-    connect = function (self)
+    connect = function(self)
         self:setState("running")
 
         self.enetclient = enet.host_create()
         self.clientpeer = self.enetclient:connect("localhost:6750")
     end,
 
-    setState = function (self, state)
+    ready = function(self)
+        
+    end,
+
+    setState = function(self, state)
         assert(table.contains(states, state), "Invalid game state \"" .. state .. "\"!")
 
         self.state = state
     end,
 
-    checkState = function (self, state)
+    checkState = function(self, state)
         assert(table.contains(states, state), "Invalid game state \"" .. state .. "\"!")
 
         return self.state == state
     end,
 
-    load = function (self)
+    load = function(self)
         maid64.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
         init3d()
         _G.player = Player()
@@ -42,6 +46,10 @@ local game = {
             menu = {
                 Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20, "connect", "pila")
             },
+
+            lobby = {
+                Button(SCREEN_WIDTH/2, SCREEN_HEIGHT - 10, 20, 10, "ready", "ready")
+            }
         }
 
         self.functions = {
@@ -50,7 +58,7 @@ local game = {
         }
     end,
 
-    update = function (self, dt)
+    update = function(self, dt)
         if self:checkState("running") then
             if DEBBUGGING then
                 player:update(dt)

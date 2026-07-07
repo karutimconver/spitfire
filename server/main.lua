@@ -9,7 +9,7 @@ while true do
     local event = host:service(100)
     while event do
         if event.type == "receive" then
-            print("message received" .. event.data)
+            print("message received: " .. event.data)
         elseif event.type == "connect" then
             print(event.peer, "connected.")
             event.peer:send( "ping" )

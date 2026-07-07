@@ -54,9 +54,13 @@ local function Player(pos)
         end,
 
         rotate = function (self, angularVelocity, dt)
-            self.forward = cpml.mat4.mul_vec3_perspective(self.forward, cpml.mat4.from_angle_axis(cpml.vec3.len(angularVelocity * dt), angularVelocity), self.forward)
-            self.right = cpml.mat4.mul_vec3_perspective(self.right, cpml.mat4.from_angle_axis(cpml.vec3.len(angularVelocity * dt), angularVelocity), self.right)
-            self.up = cpml.mat4.mul_vec3_perspective(self.up, cpml.mat4.from_angle_axis(cpml.vec3.len(angularVelocity * dt), angularVelocity), self.up)
+            if not cpml.vec3.is_zero(angularVelocity) then
+                local rot = cpml.mat4.from_angle_axis(cpml.vec3.len(angularVelocity * dt), angularVelocity)
+
+                self.forward = cpml.mat4.mul_vec3_perspective(self.forward, rot, self.forward)
+                self.right = cpml.mat4.mul_vec3_perspective(self.right, rot, self.right)
+                self.up = cpml.mat4.mul_vec3_perspective(self.up, rot, self.up)
+            end
         end,
 
         move = function(self, dt)
@@ -97,9 +101,15 @@ local function Player(pos)
                 self.position.y = 0
                 self.linearVelocity.y = 0
             end
+
+            print("velocity: ", self.linearVelocity)
         end,
 
         update = function(self, dt)
+            self.forward = cpml.vec3.normalize(self.forward)
+            self.right = cpml.vec3.normalize(cpml.vec3.cross( self.up, self.forward))
+            self.up = cpml.vec3.normalize(cpml.vec3.cross(self.forward, self.right))
+
             self:move(dt)
         end
     }
