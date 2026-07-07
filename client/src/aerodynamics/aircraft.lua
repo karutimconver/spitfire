@@ -84,6 +84,7 @@ local function Aircraft()
                 chord = 1.5,
                 AR = 2.5,
                 id = "verticalStabilizer",
+                vertical = true,
                 flap = false,
             })
         },
@@ -140,7 +141,11 @@ local function Aircraft()
 
                 aForce, aTorque = airfoil:calculateForcesAndTorque(localAirVelocity, right, AoA, AIR_DENSITY)
                 if airfoil.vertical then
-                    aForce, aTorque = airfoil:calculateForcesAndTorque(localAirVelocity, up, AoA, AIR_DENSITY)
+                    local v_fwd  = -cpml.vec3.dot(localAir, forward)
+                    local v_side = -cpml.vec3.dot(localAir, right)
+
+                    local beta = math.deg(math.atan2(v_side, v_fwd))
+                    aForce, aTorque = airfoil:calculateForcesAndTorque(localAirVelocity, up, beta, AIR_DENSITY)
                 end
                 totalForce = cpml.vec3.add(totalForce, aForce)
                 pitchingMoment = pitchingMoment + aTorque
