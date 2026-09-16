@@ -66,7 +66,7 @@ local function Player(pos)
         move = function(self, dt)
             self:controls(dt)
 
-            -- projetar o vetor right para o plano Oxz
+            --[[ projetar o vetor right para o plano Oxz
             local p_right = cpml.vec3.normalize(cpml.vec3.new(self.right.x, 0, self.right.z))
 
             -- projetar o vetor up no plano que contem o vetor right e o vetor forward

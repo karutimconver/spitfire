@@ -10,8 +10,8 @@ local MOMENT_OF_INERTIA = cpml.vec3.new(40000, -- Pitch
                                         14235) -- Roll
 local ANGULAR_DAMPING = MOMENT_OF_INERTIA * 0.2
 local POWER = 770000
-local n = 0.91               -- propeller efficiency
-
+local n = 0.91                                 -- propeller efficiency
+local pitchCorrectionFactor = 0.8              -- ajust has needed
 
 local function Aircraft()
     return {
@@ -157,7 +157,7 @@ local function Aircraft()
             local thrust = n * POWER / speed
             totalForce = cpml.vec3.add(totalForce, cpml.vec3.scale(forward, thrust))
 
-            totalTorque = cpml.vec3.add(totalTorque, cpml.vec3.scale(cpml.vec3.normalize(right), -pitchingMoment))
+            totalTorque = cpml.vec3.add(totalTorque, cpml.vec3.scale(cpml.vec3.normalize(right), -pitchingMoment*pitchCorrectionFactor))
             local dampingTorque = cpml.vec3.new(relativeAngularVelocity.x, relativeAngularVelocity.y, relativeAngularVelocity.z) * -ANGULAR_DAMPING
             totalTorque = totalTorque + cpml.mat4.mul_vec3_perspective(dampingTorque, cpml.mat4.transpose(cpml.mat4.new(), perspective), dampingTorque)
 
