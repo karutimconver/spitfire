@@ -44,7 +44,7 @@ local game = {
 
         self.buttons = {
             menu = {
-                Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20, "connect", "jogar")
+                Button(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 20, "connect", "pila")
             },
 
             lobby = {
