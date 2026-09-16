@@ -11,7 +11,7 @@ local MOMENT_OF_INERTIA = cpml.vec3.new(40000, -- Pitch
 local ANGULAR_DAMPING = MOMENT_OF_INERTIA * 0.2
 local POWER = 770000
 local n = 0.91                                 -- propeller efficiency
-local pitchCorrectionFactor = 0.8              -- ajust has needed
+local pitchCorrectionFactor = 1              -- ajust has needed
 
 local function Aircraft()
     return {
